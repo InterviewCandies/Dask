@@ -1,13 +1,19 @@
-export interface State {
-  counter: number;
+export type Message = {
+  status?: string;
+  message?: string;
+  data?: any;
+};
+
+export interface User {
+  email: string;
+  photoURL?: string;
 }
 
-export const INCREMENT = "INCREMENT";
+export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
 
-interface IncrementAction {
-  type: typeof INCREMENT;
+interface AuthenticateAction {
+  type: typeof AUTHENTICATE_USER;
+  payload: User;
 }
 
-export type ActionTypes = IncrementAction;
-
-export type DispatchType = (arg: ActionTypes) => ActionTypes;
+export type ActionTypes = AuthenticateAction;

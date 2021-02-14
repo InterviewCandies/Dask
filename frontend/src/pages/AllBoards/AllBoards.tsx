@@ -1,19 +1,10 @@
 import React, { useState } from "react";
 import Card from "../../components/Card/Card";
-import { connect, useDispatch, useSelector } from "react-redux";
-import { State } from "../../types";
-import { increase } from "../../actions";
-import { Dispatch } from "redux";
 import { Dialog } from "@material-ui/core";
 import NewBoard from "../../container/NewBoard/NewBoard";
 import Layout from "../../components/common/Layout/Layout";
 
 const AllBoards: React.FC = () => {
-  const counter: number = useSelector((state: State) => state.counter);
-  const dispatch: Dispatch<any> = useDispatch();
-  const increaseButt: any = React.useCallback(() => dispatch(increase()), [
-    dispatch,
-  ]);
   const [open, setOpen] = useState(false);
   return (
     <Layout>

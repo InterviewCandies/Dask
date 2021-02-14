@@ -1,28 +1,64 @@
-import React, { useState } from "react";
+import { useSnackbar } from "notistack";
+import React, { Dispatch, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
+import { authenticateUser } from "../../actions/authentication";
+import { signup } from "../../api/authentication";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
+import { User } from "../../types";
 
 function Register() {
-  const [email, setEmail] = useState("");
+  const [showButtonGroup, setShowButtonGroup] = useState("");
   const { handleSubmit, register, errors } = useForm();
+  const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
+  const dispatch: Dispatch<any> = useDispatch();
+
+  const updateUser = useCallback(
+    (data: User) => dispatch(authenticateUser(data)),
+    [dispatch]
+  );
+
+  const onSubmit = async (data: { email: string; password: string }) => {
+    const result = await signup(data.email, data.password);
+    if (result.status) enqueueSnackbar(result.message, { variant: "error" });
+    else {
+      updateUser(result.data);
+      history.push("/all");
+    }
+  };
   return (
     <div className="w-screen h-screen bg-blue-300 flex justify-center items-center">
       <div className="bg-white h-full sm:h-auto p-8 w-full sm:w-96 rounded shadow-md flex justify-center flex-col">
         <h1 className="font-bold text-gray-500 text-center py-5">
           Sign up for your account
         </h1>
-        <form className="space-y-4" onSubmit={handleSubmit(() => {})}>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <input
             className="border-gray-300 border-solid border-2 bg-gray-100 text-gray-500 p-2 w-full outline-none focus: border-solid focus:border-blue-500 focus:border-2"
             placeholder="Enter email"
             name="email"
-            onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
+            onChange={(e) =>
+              setShowButtonGroup((e.target as HTMLInputElement).value)
+            }
             ref={register({
               required: true,
               pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
             })}
             type="email"
+          ></input>
+          <input
+            className="border-gray-300 border-solid border-2 bg-gray-100 text-gray-500 p-2 w-full outline-none focus: border-solid focus:border-blue-500 focus:border-2"
+            placeholder="Enter password"
+            name="password"
+            onChange={(e) =>
+              setShowButtonGroup((e.target as HTMLInputElement).value)
+            }
+            ref={register({
+              required: true,
+            })}
+            type="password"
           ></input>
           <p className="text-xs text-gray-500 font-light">
             By signing up, you confirm that you've read and accepted our
@@ -31,8 +67,8 @@ function Register() {
             <span className="font-semibold mx-1">Privacy Policy</span>.
           </p>
           <button
-            className={`font-semibold w-full p-2 rounded ${
-              errors.email || email.trim().length == 0
+            className={`font-semibold w-full p-2 rounded  focus:outline-none ${
+              errors.email || showButtonGroup.trim().length == 0
                 ? "bg-gray-200 text-gray-400"
                 : "bg-blue-500 text-white hover:bg-blue-400"
             }`}
@@ -41,7 +77,7 @@ function Register() {
             Sign up
           </button>
         </form>
-        {email.trim().length === 0 ? (
+        {showButtonGroup.trim().length === 0 ? (
           <>
             <h1 className="text-center font-light text-sm py-4">OR</h1>
             <div className="pb-4">
@@ -49,7 +85,7 @@ function Register() {
             </div>
           </>
         ) : null}
-        <hr className="border-solid border-gray-300 pt-3"></hr>
+        <hr className="border-solid border-gray-300 my-3"></hr>
         <h1 className="text-center text-gray-500 text-sm">
           Already have account ?{" "}
           <Link to="/" className="text-blue-500 font-semibold">
