@@ -2,7 +2,7 @@ import { useSnackbar } from "notistack";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { signup } from "../../api/authentication";
+import { signup } from "../../api/firebase/authentication";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
 import useGetToken from "../../hooks/useGetToken";
 

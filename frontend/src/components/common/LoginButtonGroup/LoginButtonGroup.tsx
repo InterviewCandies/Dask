@@ -3,7 +3,7 @@ import React from "react";
 import {
   signInWithGithub,
   signInWithGoogle,
-} from "../../../api/authentication";
+} from "../../../api/firebase/authentication";
 import GithubIcon from "../../../assets/img/github.svg";
 import GoogleIcon from "../../../assets/img/google.svg";
 import useGetToken from "../../../hooks/useGetToken";

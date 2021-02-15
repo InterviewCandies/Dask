@@ -5,11 +5,12 @@ import { useForm } from "react-hook-form";
 import { Board } from "../../types";
 import { EventType } from "@testing-library/react";
 import { createBoard } from "../../api/board";
+import { uploadImage } from "../../api/firebase/filesStorage";
 function NewBoard(props: { handleClose: Function }) {
   const [visibility, setVisibility] = useState(1);
   const { register, handleSubmit } = useForm();
   const fileRef = useRef();
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState();
 
   // create a preview as a side effect, whenever selected file is changed
@@ -40,7 +41,11 @@ function NewBoard(props: { handleClose: Function }) {
   const onSubmit = async (data: Board) => {
     data.visibility = Boolean(visibility);
     console.log("hello");
-    const result = await createBoard(data);
+    //const result = await createBoard(data);
+    if (selectedFile) {
+      const result = await uploadImage(selectedFile);
+      console.log(result);
+    }
     props.handleClose();
   };
   return (
