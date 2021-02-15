@@ -5,10 +5,12 @@ const initialState: User = {
   photoURL: "",
 };
 
-export const reducer = (state = initialState, action: ActionTypes): User => {
+const reducer = (state = initialState, action: ActionTypes): User => {
   switch (action.type) {
     case AUTHENTICATE_USER:
       return { ...action.payload };
   }
   return state;
 };
+
+export default reducer;

@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "./components/common/Header/Header";
 import AllBoards from "./pages/AllBoards/AllBoards";
 import { Provider, useSelector } from "react-redux";
 import {
@@ -14,18 +13,20 @@ import Login from "./pages/Login/Login";
 import Page404 from "./pages/Page404/Page404";
 import Register from "./pages/Register/Register";
 import { SnackbarProvider } from "notistack";
-import { User } from "./types";
+import { StateTypes, User } from "./types";
 
 const PrivateRoute: React.FC<RouteProps> = ({
   component: Component,
   ...rest
 }) => {
-  const email = useSelector((state: User) => state.email);
+  const email = useSelector((state: StateTypes) => {
+    return state.authentication.email;
+  });
   return (
     <Route
       {...rest}
       render={(props) =>
-        email.length ? (
+        email?.length ? (
           //@ts-ignore
           <Component {...props}></Component>
         ) : (

@@ -1,13 +1,15 @@
 import React from "react";
 import { Menu, MenuItem } from "@material-ui/core";
 import Searchbar from "../Searchbar/Searchbar";
-import { User } from "../../../types";
+import { StateTypes, User } from "../../../types";
 import { useSelector } from "react-redux";
 const avatar =
   "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixid=MXwxMjA3fDB8MHxzZWFyY2h8NXx8cGVvcGxlfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60";
 function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const { email, photoURL } = useSelector((state: User) => state);
+  const { email, photoURL } = useSelector(
+    (state: StateTypes) => state.authentication
+  );
   return (
     <div className="bg-white flex justify-between items-center p-5 flex-col sm:flex-row">
       <h1>Logo</h1>

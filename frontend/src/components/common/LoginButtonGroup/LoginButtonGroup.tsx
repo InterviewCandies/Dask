@@ -11,6 +11,7 @@ import {
   signInWithGoogle,
 } from "../../../api/authentication";
 import { useSnackbar } from "notistack";
+import { createUser } from "../../../api/user";
 
 const Button = (props: {
   children: JSX.Element | string;
@@ -39,22 +40,23 @@ function LoginButtonGroup() {
     [dispatch]
   );
 
-  const handleResult = (result: Message) => {
+  const handleResult = async (result: Message) => {
     if (result.status) enqueueSnackbar(result.message, { variant: "error" });
     else {
       updateUser(result.data);
+      await createUser(result.data);
       history.push("/all");
     }
   };
 
   const continueWithGoogle = async () => {
     const result = await signInWithGoogle();
-    handleResult(result);
+    await handleResult(result);
   };
 
   const continueWithGithub = async () => {
     const result = await signInWithGithub();
-    handleResult(result);
+    await handleResult(result);
   };
 
   return (

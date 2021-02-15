@@ -7,7 +7,7 @@ import { authenticateUser } from "../../actions/authentication";
 import { signup } from "../../api/authentication";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
 import { User } from "../../types";
-
+import { createUser } from "../../api/user";
 function Register() {
   const [showButtonGroup, setShowButtonGroup] = useState("");
   const { handleSubmit, register, errors } = useForm();
@@ -25,6 +25,7 @@ function Register() {
     if (result.status) enqueueSnackbar(result.message, { variant: "error" });
     else {
       updateUser(result.data);
+      await createUser(result.data);
       history.push("/all");
     }
   };
