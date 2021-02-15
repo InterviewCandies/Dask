@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const Board = new Schema({
-  cover_url: {
-    type: String,
+  cover: {
+    type: Buffer,
+    ContentType: String,
   },
   title: {
     type: String,
@@ -14,10 +15,10 @@ const Board = new Schema({
   visibility: {
     type: Boolean,
   },
-  blocks: {
+  lists: {
     type: [],
   },
-  owner: mongoose.Schema.Types.ObjectId,
+  owner: String,
 });
 
 module.exports = mongoose.model("Board", Board);

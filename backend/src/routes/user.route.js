@@ -1,12 +1,12 @@
 const router = require("express").Router();
+const Controller = require("../controller").UserController;
+const controller = new Controller();
 
 router.get("/", (req, res) => {});
 
 router.get("/:id", (req, res) => {});
 
-router.post("/login", (req, res) => {});
-
-router.post("/create", (req, res) => {});
+router.post("/create", controller.create);
 
 router.post("/delete/:id", (req, res) => {});
 

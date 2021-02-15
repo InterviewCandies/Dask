@@ -6,7 +6,8 @@ class BoardController {
   }
 
   create(req, res) {
-    const board = new Board(req.body);
+    const { title, visibility } = req.body;
+    const board = new Board({ title, visibility });
     board
       .save()
       .then((newlyCreated) => res.status(200).json({ message: "Succesfully" }))
@@ -14,7 +15,8 @@ class BoardController {
   }
 
   get(req, res) {
-    Board.find((error, boards) => {
+    const { user } = req.query;
+    Board.findOne({ owner: user }, (error, boards) => {
       if (error) {
         console.log(error);
       } else {

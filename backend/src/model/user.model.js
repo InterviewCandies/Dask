@@ -2,15 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const User = new Schema({
-  username: {
+  photoURL: {
     type: String,
-  },
-  password: {
-    type: String,
-  },
-  avatar: {
-    data: Buffer,
-    contentType: String,
   },
   email: {
     type: String,
