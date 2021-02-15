@@ -1,17 +1,13 @@
-import React, { useCallback } from "react";
-import GoogleIcon from "../../../assets/img/google.svg";
-import GithubIcon from "../../../assets/img/github.svg";
-import { useHistory } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { Dispatch } from "redux";
-import { authenticateUser } from "../../../actions/authentication";
-import { Message, User } from "../../../types";
+import { useSnackbar } from "notistack";
+import React from "react";
 import {
   signInWithGithub,
   signInWithGoogle,
 } from "../../../api/authentication";
-import { useSnackbar } from "notistack";
-import { createUser } from "../../../api/user";
+import GithubIcon from "../../../assets/img/github.svg";
+import GoogleIcon from "../../../assets/img/google.svg";
+import useGetToken from "../../../hooks/useGetToken";
+import { Message } from "../../../types";
 
 const Button = (props: {
   children: JSX.Element | string;
@@ -31,22 +27,12 @@ const Button = (props: {
 };
 
 function LoginButtonGroup() {
-  const history = useHistory();
-  const dispatch: Dispatch<any> = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-
-  const updateUser = useCallback(
-    (data: User) => dispatch(authenticateUser(data)),
-    [dispatch]
-  );
+  const getToken = useGetToken();
 
   const handleResult = async (result: Message) => {
     if (result.status) enqueueSnackbar(result.message, { variant: "error" });
-    else {
-      updateUser(result.data);
-      await createUser(result.data);
-      history.push("/all");
-    }
+    else await getToken(result);
   };
 
   const continueWithGoogle = async () => {

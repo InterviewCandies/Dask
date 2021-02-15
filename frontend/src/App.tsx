@@ -13,20 +13,18 @@ import Login from "./pages/Login/Login";
 import Page404 from "./pages/Page404/Page404";
 import Register from "./pages/Register/Register";
 import { SnackbarProvider } from "notistack";
-import { StateTypes, User } from "./types";
+import { AUTH_TOKEN } from "./types";
 
 const PrivateRoute: React.FC<RouteProps> = ({
   component: Component,
   ...rest
 }) => {
-  const email = useSelector((state: StateTypes) => {
-    return state.authentication.email;
-  });
+  const token = localStorage.getItem(AUTH_TOKEN);
   return (
     <Route
       {...rest}
       render={(props) =>
-        email?.length ? (
+        token ? (
           //@ts-ignore
           <Component {...props}></Component>
         ) : (

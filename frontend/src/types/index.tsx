@@ -26,6 +26,7 @@ export interface StateTypes {
 export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
 export const GET_BOARDS_BY_USER = "GET_BOARDS_BY_USER";
 export const UPDATE_BOARDS = "UPDATE_BOARDS";
+export const AUTH_TOKEN = "AUTH_TOKEN";
 
 interface AuthenticateAction {
   type: typeof AUTHENTICATE_USER;

@@ -1,33 +1,21 @@
 import { useSnackbar } from "notistack";
-import React, { Dispatch, useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
-import { authenticateUser } from "../../actions/authentication";
+import { Link } from "react-router-dom";
 import { signup } from "../../api/authentication";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
-import { User } from "../../types";
-import { createUser } from "../../api/user";
+import useGetToken from "../../hooks/useGetToken";
+
 function Register() {
   const [showButtonGroup, setShowButtonGroup] = useState("");
   const { handleSubmit, register, errors } = useForm();
   const { enqueueSnackbar } = useSnackbar();
-  const history = useHistory();
-  const dispatch: Dispatch<any> = useDispatch();
-
-  const updateUser = useCallback(
-    (data: User) => dispatch(authenticateUser(data)),
-    [dispatch]
-  );
+  const getToken = useGetToken();
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    const result = await signup(data.email, data.password);
+    let result = await signup(data.email, data.password);
     if (result.status) enqueueSnackbar(result.message, { variant: "error" });
-    else {
-      updateUser(result.data);
-      await createUser(result.data);
-      history.push("/all");
-    }
+    else await getToken(result);
   };
   return (
     <div className="w-screen h-screen bg-blue-300 flex justify-center items-center">

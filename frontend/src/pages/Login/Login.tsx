@@ -1,32 +1,19 @@
 import { useSnackbar } from "notistack";
-import React, { useCallback } from "react";
-import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
-import { Dispatch } from "redux";
-import { authenticateUser } from "../../actions/authentication";
-import { login, signInWithGoogle } from "../../api/authentication";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { login } from "../../api/authentication";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
-import { Message, User } from "../../types";
+import useGetToken from "../../hooks/useGetToken";
 
 function Login() {
   const { handleSubmit, register } = useForm();
   const { enqueueSnackbar } = useSnackbar();
-  const history = useHistory();
-  const dispatch: Dispatch<any> = useDispatch();
-
-  const updateUser = useCallback(
-    (data: User) => dispatch(authenticateUser(data)),
-    [dispatch]
-  );
+  const getToken = useGetToken();
 
   const onSubmit = async (data: { email: string; password: string }) => {
     const result = await login(data.email, data.password);
     if (result.status) enqueueSnackbar(result.message, { variant: "error" });
-    else {
-      updateUser(result.data);
-      history.push("/all");
-    }
+    else await getToken(result);
   };
 
   return (
