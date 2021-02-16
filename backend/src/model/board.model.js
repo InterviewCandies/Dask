@@ -2,9 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const Board = new Schema({
-  cover: {
-    type: Buffer,
-    ContentType: String,
+  coverURL: {
+    type: String,
   },
   title: {
     type: String,
@@ -18,7 +17,9 @@ const Board = new Schema({
   lists: {
     type: [],
   },
-  owner: String,
+  owner: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Board", Board);
