@@ -6,12 +6,13 @@ class BoardController {
   }
 
   create(req, res) {
-    const { title, visibility, coverURL, owner } = req.body;
+    const { title, visibility, coverURL, owner, members } = req.body;
     const board = new Board({
       title,
       visibility,
       coverURL,
       owner,
+      members: [...members],
     });
     board
       .save()
