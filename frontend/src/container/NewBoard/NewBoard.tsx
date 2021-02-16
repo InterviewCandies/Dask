@@ -78,7 +78,7 @@ function NewBoard(props: { handleClose: Function }) {
   };
   return (
     <form
-      className="bg-white p-4 flex-col flex space-y-8 min-w-min md:w-96 rounded relative"
+      className="bg-white p-4 flex-col flex space-y-8 min-w-min md:w-96 rounded relative p-4"
       onSubmit={handleSubmit(onSubmit)}
     >
       <img

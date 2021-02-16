@@ -1,21 +1,33 @@
 import React from "react";
-import { Board, User } from "../../types";
+import {
+  Board,
+  DEFAULT_AVATAR,
+  MAXIMUM_MEMBERS_DISPLAYED_PER_CARD,
+  User,
+} from "../../types";
 
 const Avatar = (props: { photoUrl: any }) => {
-  return <img className="w-9 h-9 rounded-xl" src={props.photoUrl}></img>;
+  return (
+    <img
+      className="w-9 h-9 rounded-xl"
+      src={props.photoUrl || DEFAULT_AVATAR}
+    ></img>
+  );
 };
 
 const displayMembers = (members: User[]) => {
   const shortend =
-    members.length > 3 ? (
+    members.length > MAXIMUM_MEMBERS_DISPLAYED_PER_CARD ? (
       <span className="text-sm text-gray-400">
-        + {members.length - 3} others
+        + {members.length - MAXIMUM_MEMBERS_DISPLAYED_PER_CARD} others
       </span>
     ) : null;
   return (
     <div className="flex space-x-2 items-center">
       {members.map((member, i) => {
-        return i < 3 ? <Avatar photoUrl={member.photoURL}></Avatar> : null;
+        return i < MAXIMUM_MEMBERS_DISPLAYED_PER_CARD ? (
+          <Avatar photoUrl={member.photoURL} key={member.email}></Avatar>
+        ) : null;
       })}
       {shortend}
     </div>

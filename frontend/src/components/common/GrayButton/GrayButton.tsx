@@ -4,36 +4,30 @@ interface Props {
   children: JSX.Element | string;
   icon?: string;
   color?: string;
-  onClick: Function;
-  ref?: any;
+  onClick?: Function;
   active?: boolean;
+  className?: string;
 }
 
-const GrayButton: React.FC<Props> = ({
-  children,
-  icon,
-  onClick,
-  color,
-  active,
-}) => {
+const GrayButton = React.forwardRef((props: Props, ref) => {
+  const { icon, color, onClick, active, className, children } = props;
   return (
     <button
       type="button"
-      className={`bg-gray-200 text-gray-500  w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none ${color} ${
+      className={`bg-gray-200 text-gray-500 text-left py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none ${color} ${
         active ? "bg-blue-500 text-white" : ""
-      }`}
+      }  ${className}`}
+      ref={ref as any}
       onClick={(e) => {
         e.stopPropagation();
-        onClick();
+        if (props.onClick) props.onClick();
       }}
-      style={active ? { color: "#fff" } : {}}
+      style={props.active ? { color: "#fff" } : {}}
     >
-      {icon ? (
-        <i className={`${icon} mr-2 ${active && "text-white"}`}></i>
-      ) : null}{" "}
+      {icon ? <i className={`${icon} ${active && "text-white"}`}></i> : null}{" "}
       {children}
     </button>
   );
-};
+});
 
 export default GrayButton;

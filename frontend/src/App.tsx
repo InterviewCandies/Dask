@@ -14,6 +14,7 @@ import Page404 from "./pages/Page404/Page404";
 import Register from "./pages/Register/Register";
 import { SnackbarProvider } from "notistack";
 import { AUTH_TOKEN } from "./types";
+import Board from "./pages/Board/Board";
 
 const PrivateRoute: React.FC<RouteProps> = ({
   component: Component,
@@ -45,6 +46,11 @@ function App() {
             <PrivateRoute
               path="/all"
               component={AllBoards}
+              exact
+            ></PrivateRoute>
+            <PrivateRoute
+              path="/board/:id"
+              component={Board}
               exact
             ></PrivateRoute>
             <PrivateRoute path="/404" component={Page404}></PrivateRoute>
