@@ -29,7 +29,7 @@ export const UPDATE_BOARDS = "UPDATE_BOARDS";
 export const ADD_BOARD = "ADD_BOARD";
 export const AUTH_TOKEN = "AUTH_TOKEN";
 export const DEFAULT_BOARD_COVER =
-  "https://images.unsplash.com/photo-1552664730-d307ca884978?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTN8fHRlYW13b3JrfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60";
+  "https://images.unsplash.com/photo-1486520299386-6d106b22014b?ixid=MXwxMjA3fDB8MHxzZWFyY2h8NHx8Ymx1ZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60";
 interface AuthenticateAction {
   type: typeof AUTHENTICATE_USER;
   payload: User;

@@ -1,17 +1,21 @@
 import { useSnackbar } from "notistack";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../../api/firebase/authentication";
+import Loader from "../../components/common/Loader/Loader";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
 import useGetToken from "../../hooks/useGetToken";
 
 function Login() {
   const { handleSubmit, register } = useForm();
   const getToken = useGetToken();
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: { email: string; password: string }) => {
+    setLoading(true);
     const result = await login(data.email, data.password);
     await getToken(result);
+    setLoading(false);
   };
 
   return (
@@ -51,6 +55,7 @@ function Login() {
           </a>
         </h1>
       </div>
+      {loading && <Loader title="Processing..."></Loader>}
     </div>
   );
 }

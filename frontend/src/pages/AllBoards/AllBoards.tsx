@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Card from "../../components/Card/Card";
 import { Dialog } from "@material-ui/core";
 import NewBoard from "../../container/NewBoard/NewBoard";
@@ -7,6 +7,7 @@ import { fetchBoardsByEmail } from "../../api/board";
 import { useDispatch, useSelector } from "react-redux";
 import { StateTypes } from "../../types";
 import { errorHandler } from "../../utils/errorHandler";
+import Loader from "../../components/common/Loader/Loader";
 
 const AllBoards: React.FC = () => {
   const [open, setOpen] = useState(false);

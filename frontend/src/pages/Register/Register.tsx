@@ -3,17 +3,21 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { signup } from "../../api/firebase/authentication";
+import Loader from "../../components/common/Loader/Loader";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
 import useGetToken from "../../hooks/useGetToken";
 
 function Register() {
   const [showButtonGroup, setShowButtonGroup] = useState("");
   const { handleSubmit, register, errors } = useForm();
+  const [loading, setLoading] = useState(false);
   const getToken = useGetToken();
 
   const onSubmit = async (data: { email: string; password: string }) => {
+    setLoading(true);
     let result = await signup(data.email, data.password);
     await getToken(result);
+    setLoading(false);
   };
   return (
     <div className="w-screen h-screen bg-blue-300 flex justify-center items-center">
@@ -80,6 +84,7 @@ function Register() {
           </Link>
         </h1>
       </div>
+      {loading && <Loader title="Processing..."></Loader>}
     </div>
   );
 }

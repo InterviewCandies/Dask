@@ -9,21 +9,20 @@ import GrayButton from "../../components/common/GrayButton/GrayButton";
 import fallbackImage from "../../assets/img/fallback.jpg";
 import { useForm } from "react-hook-form";
 import { Board, DEFAULT_BOARD_COVER, Message, StateTypes } from "../../types";
-import { EventType } from "@testing-library/react";
 import { createBoard } from "../../api/board";
 import { uploadImage } from "../../api/firebase/filesStorage";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
 import { addBoard } from "../../actions/board";
 function NewBoard(props: { handleClose: Function }) {
-  const [visibility, setVisibility] = useState(1);
+  const [visibility, setVisibility] = useState(false);
   const { register, handleSubmit } = useForm();
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const fileRef = useRef();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState();
-  const user = useSelector((state: StateTypes) => state.authentication.email);
+  const user = useSelector((state: StateTypes) => state.authentication);
   // create a preview as a side effect, whenever selected file is changed
   // Reference: https://stackoverflow.com/a/57781164/14480038
 
@@ -55,7 +54,7 @@ function NewBoard(props: { handleClose: Function }) {
   };
 
   const onSubmit = async (data: Board) => {
-    data.visibility = Boolean(visibility);
+    data.visibility = visibility;
     let result: Message = {};
 
     if (selectedFile) {
@@ -66,7 +65,8 @@ function NewBoard(props: { handleClose: Function }) {
       }
     }
     data.coverURL = result?.data || DEFAULT_BOARD_COVER;
-    data.owner = user;
+    data.owner = user.email;
+    data.members = [{ email: user.email, photoURL: user.photoURL }];
     result = await createBoard(data);
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
@@ -82,7 +82,7 @@ function NewBoard(props: { handleClose: Function }) {
       onSubmit={handleSubmit(onSubmit)}
     >
       <img
-        className="w-full h-32 object-contain"
+        className="w-full h-40"
         src={preview ? preview : fallbackImage}
       ></img>
       <input
@@ -91,7 +91,7 @@ function NewBoard(props: { handleClose: Function }) {
         name="title"
         ref={register({ required: true })}
       ></input>
-      <div className="flex justify-between w-full">
+      <div className="flex justify-between w-full grid grid-cols-2 space-x-2">
         <GrayButton
           icon="fas fa-image"
           onClick={() => {
@@ -113,13 +113,15 @@ function NewBoard(props: { handleClose: Function }) {
         ></input>
         <GrayButton
           icon="fas fa-lock"
-          onClick={() => setVisibility((prevState) => 1 - prevState)}
+          active={visibility}
+          onClick={() => setVisibility((prevState) => !prevState)}
         >
-          Visibility
+          Private
         </GrayButton>
       </div>
       <div className="flex justify-end space-x-2">
         <button
+          type="button"
           className="py-2 px-3 hover:bg-gray-200 focus:outline-none rounded-lg"
           onClick={() => props.handleClose()}
         >
