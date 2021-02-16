@@ -5,17 +5,17 @@ export type Message = {
 };
 
 export interface User {
-  _id?: string;
   email: string;
   photoURL?: string;
 }
 
 export interface Board {
   title: string;
-  cover?: any;
+  _id: string;
+  coverURL?: string;
   members?: User[];
   visibility: Boolean;
-  owner?: User;
+  owner?: string | undefined;
 }
 
 export interface StateTypes {
@@ -26,8 +26,10 @@ export interface StateTypes {
 export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
 export const GET_BOARDS_BY_USER = "GET_BOARDS_BY_USER";
 export const UPDATE_BOARDS = "UPDATE_BOARDS";
+export const ADD_BOARD = "ADD_BOARD";
 export const AUTH_TOKEN = "AUTH_TOKEN";
-
+export const DEFAULT_BOARD_COVER =
+  "https://images.unsplash.com/photo-1552664730-d307ca884978?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTN8fHRlYW13b3JrfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60";
 interface AuthenticateAction {
   type: typeof AUTHENTICATE_USER;
   payload: User;
@@ -43,4 +45,13 @@ interface UpdateBoards {
   payload: Board[];
 }
 
-export type ActionTypes = AuthenticateAction | GetBoardsByUser | UpdateBoards;
+interface AddBoard {
+  type: typeof ADD_BOARD;
+  payload: Board;
+}
+
+export type ActionTypes =
+  | AuthenticateAction
+  | GetBoardsByUser
+  | UpdateBoards
+  | AddBoard;

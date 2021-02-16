@@ -9,13 +9,11 @@ import useGetToken from "../../hooks/useGetToken";
 function Register() {
   const [showButtonGroup, setShowButtonGroup] = useState("");
   const { handleSubmit, register, errors } = useForm();
-  const { enqueueSnackbar } = useSnackbar();
   const getToken = useGetToken();
 
   const onSubmit = async (data: { email: string; password: string }) => {
     let result = await signup(data.email, data.password);
-    if (result.status) enqueueSnackbar(result.message, { variant: "error" });
-    else await getToken(result);
+    await getToken(result);
   };
   return (
     <div className="w-screen h-screen bg-blue-300 flex justify-center items-center">

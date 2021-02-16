@@ -27,22 +27,16 @@ const Button = (props: {
 };
 
 function LoginButtonGroup() {
-  const { enqueueSnackbar } = useSnackbar();
   const getToken = useGetToken();
-
-  const handleResult = async (result: Message) => {
-    if (result.status) enqueueSnackbar(result.message, { variant: "error" });
-    else await getToken(result);
-  };
 
   const continueWithGoogle = async () => {
     const result = await signInWithGoogle();
-    await handleResult(result);
+    await getToken(result);
   };
 
   const continueWithGithub = async () => {
     const result = await signInWithGithub();
-    await handleResult(result);
+    await getToken(result);
   };
 
   return (

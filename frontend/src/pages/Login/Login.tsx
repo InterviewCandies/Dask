@@ -7,13 +7,11 @@ import useGetToken from "../../hooks/useGetToken";
 
 function Login() {
   const { handleSubmit, register } = useForm();
-  const { enqueueSnackbar } = useSnackbar();
   const getToken = useGetToken();
 
   const onSubmit = async (data: { email: string; password: string }) => {
     const result = await login(data.email, data.password);
-    if (result.status) enqueueSnackbar(result.message, { variant: "error" });
-    else await getToken(result);
+    await getToken(result);
   };
 
   return (

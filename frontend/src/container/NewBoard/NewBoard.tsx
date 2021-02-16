@@ -1,20 +1,32 @@
-import React, { useRef, useState, useEffect, SetStateAction } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  SetStateAction,
+  useCallback,
+} from "react";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
 import fallbackImage from "../../assets/img/fallback.jpg";
 import { useForm } from "react-hook-form";
-import { Board } from "../../types";
+import { Board, DEFAULT_BOARD_COVER, Message, StateTypes } from "../../types";
 import { EventType } from "@testing-library/react";
 import { createBoard } from "../../api/board";
 import { uploadImage } from "../../api/firebase/filesStorage";
+import { useSnackbar } from "notistack";
+import { useDispatch, useSelector } from "react-redux";
+import { addBoard } from "../../actions/board";
 function NewBoard(props: { handleClose: Function }) {
   const [visibility, setVisibility] = useState(1);
   const { register, handleSubmit } = useForm();
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
   const fileRef = useRef();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState();
-
+  const user = useSelector((state: StateTypes) => state.authentication.email);
   // create a preview as a side effect, whenever selected file is changed
   // Reference: https://stackoverflow.com/a/57781164/14480038
+
   useEffect(() => {
     if (!selectedFile) {
       setPreview(undefined);
@@ -29,6 +41,10 @@ function NewBoard(props: { handleClose: Function }) {
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
 
+  const addNewBoard = useCallback((board: Board) => dispatch(addBoard(board)), [
+    dispatch,
+  ]);
+
   const onSelectFile = (e: any) => {
     e.stopPropagation();
     if (!e.target.files || e.target.files.length === 0) {
@@ -40,12 +56,24 @@ function NewBoard(props: { handleClose: Function }) {
 
   const onSubmit = async (data: Board) => {
     data.visibility = Boolean(visibility);
-    console.log("hello");
-    //const result = await createBoard(data);
+    let result: Message = {};
+
     if (selectedFile) {
-      const result = await uploadImage(selectedFile);
-      console.log(result);
+      result = await uploadImage(selectedFile);
+      if (result.status) {
+        enqueueSnackbar(result.message, { variant: "error" });
+        return;
+      }
     }
+    data.coverURL = result?.data || DEFAULT_BOARD_COVER;
+    data.owner = user;
+    result = await createBoard(data);
+    if (result.status) {
+      enqueueSnackbar(result.message, { variant: "error" });
+      return;
+    }
+    enqueueSnackbar("Board is added", { variant: "success" });
+    addNewBoard(result.data);
     props.handleClose();
   };
   return (

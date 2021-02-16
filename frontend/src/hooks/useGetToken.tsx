@@ -15,10 +15,18 @@ export default function useGetToken() {
     (data: User) => dispatch(authenticateUser(data)),
     [dispatch]
   );
+
   return async (result: Message) => {
+    if (result.status) {
+      enqueueSnackbar(result.message, { variant: "error" });
+      return;
+    }
     updateUser(result.data);
     result = await createUser(result.data);
-    if (result.status) enqueueSnackbar(result.message, { variant: "error" });
+    if (result.status) {
+      enqueueSnackbar(result.message, { variant: "error" });
+      return;
+    }
     localStorage.setItem(AUTH_TOKEN, result.data);
     instance.defaults.headers.common["Authorization"] = "Bearer " + result.data;
     history.push("/all");
