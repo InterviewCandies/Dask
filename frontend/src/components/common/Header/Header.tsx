@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Menu, MenuItem } from "@material-ui/core";
 import Searchbar from "../Searchbar/Searchbar";
-import { DEFAULT_AVATAR, StateTypes, User } from "../../../types";
+import { AUTH_TOKEN, DEFAULT_AVATAR, StateTypes, User } from "../../../types";
 import { useSelector } from "react-redux";
+import CustomMenu from "../../CustomMenu/CustomMenu";
+import { useHistory } from "react-router-dom";
 
 function Header() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const dropdownRef = useRef();
+  const history = useHistory();
   const { email, photoURL } = useSelector((state: StateTypes) => state.user);
+
   return (
     <div className="bg-white flex justify-between items-center p-5 flex-col sm:flex-row border-b-2	 border-gray-200">
       <h1>Logo</h1>
@@ -19,24 +23,36 @@ function Header() {
           ></img>
 
           <p>{email}</p>
-          <button
-            className="focus:outline-none"
-            onClick={(e) => setAnchorEl(e.currentTarget as any)}
-          >
-            <i className="fas fa-caret-down"></i>
-          </button>
+          <div>
+            <button className="focus:outline-none" ref={dropdownRef as any}>
+              <i className="fas fa-caret-down"></i>
+            </button>
+            <CustomMenu
+              options={[
+                {
+                  title: (
+                    <h1>
+                      <i className="fas fa-user mr-2"></i> Profile
+                    </h1>
+                  ),
+                  onClick: () => {},
+                },
+                {
+                  title: (
+                    <h1>
+                      <i className="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </h1>
+                  ),
+                  onClick: () => {
+                    localStorage.removeItem(AUTH_TOKEN);
+                    history.push("/");
+                  },
+                },
+              ]}
+              ref={dropdownRef}
+            ></CustomMenu>
+          </div>
         </div>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-        >
-          <MenuItem>Profile</MenuItem>
-          <MenuItem>Logout</MenuItem>
-        </Menu>
       </div>
     </div>
   );
