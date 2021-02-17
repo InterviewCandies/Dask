@@ -1,6 +1,7 @@
 import { Dialog } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { fetchBoardsByEmail } from "../../api/board";
 import Card from "../../components/Card/Card";
 import Layout from "../../components/common/Layout/Layout";
@@ -11,6 +12,7 @@ const AllBoards: React.FC = () => {
   const [open, setOpen] = useState(false);
   const email = useSelector((state: StateTypes) => state.authentication.email);
   const boards = useSelector((state: StateTypes) => state.boards);
+  const history = useHistory();
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -38,7 +40,13 @@ const AllBoards: React.FC = () => {
         </div>
         <div className="grid  sm:grid-cols-2   lg:grid-cols-4 md:grid-cols-3 gap-10">
           {boards.map((board) => (
-            <Card key={board._id} board={board}></Card>
+            <Card
+              key={board._id}
+              board={board}
+              onClick={() => {
+                history.push("/board/" + board._id);
+              }}
+            ></Card>
           ))}
         </div>
         <Dialog open={open} onClose={() => setOpen(false)} className="relative">

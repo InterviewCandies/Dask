@@ -13,6 +13,15 @@ export const createBoard = async (data: Board): Promise<Message> => {
   }
 };
 
+export const updateBoard = async (data: Board): Promise<Message> => {
+  try {
+    const result = await axios.post("/boards/update", data);
+    return { data: result.data };
+  } catch (error) {
+    return errorHandler(error);
+  }
+};
+
 export const fetchBoardsByEmail = (email: string) => {
   return async (dispatch: Dispatch) => {
     try {

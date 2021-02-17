@@ -33,9 +33,9 @@ const displayMembers = (members: User[]) => {
     </div>
   );
 };
-function Card(props: { board: Board }) {
+function Card(props: { board: Board; onClick: Function }) {
   return (
-    <div className="bg-white rounded-xl p-4">
+    <div className="bg-white rounded-xl p-4" onClick={() => props.onClick()}>
       <div>
         <img
           className="w-full h-48 rounded-lg"

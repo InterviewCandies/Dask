@@ -2,7 +2,7 @@ import { Menu, MenuItem } from "@material-ui/core";
 import React, { Ref, RefObject, useEffect, useRef } from "react";
 
 interface Option {
-  title: string;
+  title: string | JSX.Element;
   onClick?: Function;
 }
 
@@ -23,9 +23,9 @@ const CustomMenu = React.forwardRef(
     }, [ref]);
 
     const displayOptions = (options: Option[]) => {
-      return options.map((option) => (
+      return options.map((option, i) => (
         <MenuItem
-          key={option.title}
+          key={i}
           onClick={() => {
             if (option.onClick) option.onClick();
           }}

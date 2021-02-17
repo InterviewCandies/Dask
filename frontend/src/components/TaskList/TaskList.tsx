@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import Avatars from "../Avatars/Avatars";
 import { User, MAXIMUM_MEMBERS_DISPLAYED_PER_TASK } from "../../types";
+import CustomMenu from "../CustomMenu/CustomMenu";
 const photoURL = undefined;
 
 const members: User[] = [
@@ -45,11 +46,18 @@ const TaskCard = () => {
 };
 
 function TaskList() {
+  const optionsRef = useRef(null);
   return (
     <div className="h-full space-y-4">
       <div className="flex justify-between">
         <h1>Title</h1>
-        <i className="fas fa-ellipsis-h"></i>
+        <div>
+          <i className="fas fa-ellipsis-h" ref={optionsRef}></i>
+          <CustomMenu
+            ref={optionsRef}
+            options={[{ title: "Rename" }, { title: "Delete this list" }]}
+          ></CustomMenu>
+        </div>
       </div>
       <TaskCard></TaskCard>
       <TaskCard></TaskCard>
