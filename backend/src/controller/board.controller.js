@@ -1,4 +1,5 @@
 const Board = require("../model").Board;
+const ObjectId = require("mongoose").Types.ObjectId;
 
 class BoardController {
   constructor() {
@@ -22,7 +23,6 @@ class BoardController {
 
   get(req, res) {
     const { user } = req.query;
-    console.log(user);
     Board.find({ owner: user }, (error, boards) => {
       if (error) {
         console.log(error);
@@ -30,6 +30,30 @@ class BoardController {
         res.json(boards);
       }
     });
+  }
+
+  update(req, res) {
+    const {
+      title,
+      visibility,
+      coverURL,
+      owner,
+      members,
+      lists,
+      _id,
+    } = req.body;
+    console.log(title, visibility, coverURL, owner, members, lists, _id);
+    Board.findOneAndUpdate(
+      { _id: ObjectId(_id) },
+      { title, visibility, coverURL, members, owner, lists },
+      (error, result) => {
+        if (error) {
+          console.log(error);
+        } else {
+          res.json({ message: "successfully" });
+        }
+      }
+    );
   }
 }
 
