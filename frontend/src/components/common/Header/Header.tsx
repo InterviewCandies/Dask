@@ -6,9 +6,7 @@ import { useSelector } from "react-redux";
 
 function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const { email, photoURL } = useSelector(
-    (state: StateTypes) => state.authentication
-  );
+  const { email, photoURL } = useSelector((state: StateTypes) => state.user);
   return (
     <div className="bg-white flex justify-between items-center p-5 flex-col sm:flex-row border-b-2	 border-gray-200">
       <h1>Logo</h1>

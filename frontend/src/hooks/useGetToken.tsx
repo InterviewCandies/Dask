@@ -2,7 +2,7 @@ import { useSnackbar } from "notistack";
 import { Dispatch, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { authenticateUser } from "../actions/authentication";
+import { authenticateUser } from "../actions/user";
 import { createUser } from "../api/user";
 import { AUTH_TOKEN, Message, User } from "../types";
 import instance from "../utils/axios";

@@ -1,17 +1,22 @@
 import { useSnackbar } from "notistack";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { updateBoards } from "../../actions/board";
 import { updateBoard } from "../../api/board";
+import { fetchUsers } from "../../api/user";
+import { Drawer } from "@material-ui/core";
 import Avatars from "../../components/Avatars/Avatars";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
 import Layout from "../../components/common/Layout/Layout";
+import Loader from "../../components/common/Loader/Loader";
 import Searchbar from "../../components/common/Searchbar/Searchbar";
 import CustomMenu from "../../components/CustomMenu/CustomMenu";
 import CustomPopover from "../../components/CustomPopover/CustomPopover";
 import TaskList from "../../components/TaskList/TaskList";
+import BoardMenu from "../../container/BoardMenu/BoardMenu";
 import {
+  Board,
   DEFAULT_AVATAR,
   MAXIMUM_MEMBERS_DISPLAYED_PER_BOARD,
   StateTypes,
@@ -27,6 +32,7 @@ const VisilityMenu = ({
 }) => {
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards.find((board) => board._id === id);
+  const [loading, setLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const dispatch: Dispatch<any> = useDispatch();
 
@@ -36,60 +42,135 @@ const VisilityMenu = ({
   );
 
   const handleClick = async (status: Boolean) => {
+    setLoading(true);
     const result = await updateBoard({
       ...board,
       visibility: status,
     } as any);
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
+      setLoading(false);
       return;
     } else enqueueSnackbar("Board is updated", { variant: "success" });
     if (board && board.visibility != undefined) board.visibility = status;
     updateVisibility([...boards]);
     if (closePopover) closePopover();
+    setLoading(false);
   };
 
   return (
-    <div className="bg-white p-3 w-min space-y-3">
-      <div>
-        <h1 className="font-bold text-sm">Visibility</h1>
-        <p className="text-gray-600 text-sm mt-1">
-          Choose who can see to this board
-        </p>
+    <>
+      <div className="bg-white p-3 w-min space-y-3">
+        <div>
+          <h1 className="font-bold text-sm">Visibility</h1>
+          <p className="text-gray-600 text-sm mt-1">
+            Choose who can see to this board
+          </p>
+        </div>
+        <button
+          className={`space-y-3 rounded-xl focus:outline-none w-60 text-left p-2 pl-3 ${
+            board?.visibility ? " hover:bg-gray-100" : "bg-gray-100"
+          }`}
+          disabled={board?.visibility === false}
+          onClick={() => handleClick(false)}
+        >
+          <p className="font-semibold text-gray-600 text-sm mb-1">
+            <i className="fas fa-globe-asia mr-2"></i> Public
+          </p>
+          <p className="text-xs text-gray-700 mt-0">
+            Anyone on internet can see this
+          </p>
+        </button>
+        <button
+          className={`space-y-3 rounded-xl focus:outline-none w-60 text-left p-2 pl-3 ${
+            board?.visibility ? "bg-gray-100" : "hover:bg-gray-100"
+          }`}
+          disabled={board?.visibility === true}
+          onClick={() => handleClick(true)}
+        >
+          <p className="font-semibold text-gray-600 text-sm mb-1">
+            <i className="fas fa-lock mr-2"></i> Private
+          </p>
+          <p className="text-xs text-gray-600 mt-0">
+            Only board members can see this
+          </p>
+        </button>
       </div>
-      <button
-        className={`space-y-3 rounded-xl focus:outline-none w-60 text-left p-2 pl-3 ${
-          board?.visibility ? " hover:bg-gray-100" : "bg-gray-100"
-        }`}
-        disabled={board?.visibility === false}
-        onClick={() => handleClick(false)}
-      >
-        <p className="font-semibold text-gray-600 text-sm mb-1">
-          <i className="fas fa-globe-asia mr-2"></i> Public
-        </p>
-        <p className="text-xs text-gray-700 mt-0">
-          Anyone on internet can see this
-        </p>
-      </button>
-      <button
-        className={`space-y-3 rounded-xl focus:outline-none w-60 text-left p-2 pl-3 ${
-          board?.visibility ? "bg-gray-100" : "hover:bg-gray-100"
-        }`}
-        disabled={board?.visibility === true}
-        onClick={() => handleClick(true)}
-      >
-        <p className="font-semibold text-gray-600 text-sm mb-1">
-          <i className="fas fa-lock mr-2"></i> Private
-        </p>
-        <p className="text-xs text-gray-600 mt-0">
-          Only board members can see this
-        </p>
-      </button>
-    </div>
+      {loading && <Loader></Loader>}
+    </>
   );
 };
 
-const InvitationMenu = () => {
+const UserItem = ({ user, id }: { user: User; id: string }) => {
+  const boards = useSelector((state: StateTypes) => state.boards);
+  const board = boards.find((board) => board._id === id);
+  const [loading, setLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
+
+  const updateMembers = useCallback(
+    (board: Board[]) => {
+      dispatch(updateBoards(board));
+    },
+    [dispatch]
+  );
+
+  const addToBoard = async () => {
+    setLoading(true);
+    const result = await updateBoard({
+      ...board,
+      members: [...(board?.members as []), { ...user }],
+    } as any);
+    if (result.status) {
+      enqueueSnackbar(result.message, { variant: "error" });
+      setLoading(false);
+      return;
+    } else
+      enqueueSnackbar(`${user.email} has been added to board`, {
+        variant: "success",
+      });
+    board?.members?.push({ ...user });
+    updateMembers([...boards]);
+    setLoading(false);
+  };
+  return (
+    <>
+      <div className="flex  space-y-2 justify-between items-center text-left  hover:bg-gray-100 rounded p-2">
+        <div className="flex  items-center">
+          <img
+            className="w-8 h-8 rounded-lg mr-2"
+            src={user.photoURL ? user.photoURL : DEFAULT_AVATAR}
+          ></img>
+          <h1 className="text-sm truncate m-0 w-44">{user.email}</h1>
+        </div>
+        <button
+          className="bg-blue-500 text-white rounded-full  focus:outline-none w-7 h-7 flex items-center justify-center  font-semibold m-0"
+          onClick={addToBoard}
+        >
+          <i className="fas fa-plus text-xs"></i>
+        </button>
+      </div>
+      {loading && <Loader title="Processing..."></Loader>}
+    </>
+  );
+};
+
+const displayUsers = (users: User[], id: string) => {
+  return users.map((user) => (
+    <UserItem user={user} key={user.email} id={id}></UserItem>
+  ));
+};
+
+const InvitationMenu = ({ id }: { id: string }) => {
+  const boards = useSelector((state: StateTypes) => state.boards);
+  const board = boards?.find((board) => board._id === id);
+  let users = useSelector((state: StateTypes) => state.users);
+  users = users.filter(
+    (user) =>
+      (board?.members as User[]).findIndex(
+        (member) => user.email === member.email
+      ) < 0
+  );
   return (
     <div className="bg-gray-50 p-3 space-y-4 text-center w-80">
       <div className="text-left">
@@ -98,38 +179,31 @@ const InvitationMenu = () => {
       </div>
       <Searchbar></Searchbar>
       <div className="bg-white shadow h-48 rounded-xl p-2 overflow-y-auto space-y-2">
-        <div className="flex flex-wrap space-y-2 justify-between items-center text-left  hover:bg-gray-100 rounded p-2">
-          <div className="flex  flex-wrap items-center">
-            <img className="w-8 h-8 rounded-lg mr-2" src={DEFAULT_AVATAR}></img>
-            <h1 className="text-sm m-0">
-              Lorem, ipsum dolor sit sdadasdasdasdasda
-            </h1>
-          </div>
-          <button className="bg-blue-500 text-white rounded-full w-7 h-7 flex items-center justify-center float-right font-semibold m-0">
-            <i className="fas fa-plus text-xs"></i>
-          </button>
-        </div>
+        {displayUsers(users, id)}
       </div>
     </div>
   );
 };
 
-const members: User[] = [
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-];
-
 function BoardDetails() {
-  const ref = useRef(null);
   const visibilityRef = useRef(null);
   const invitationRef = useRef(null);
+  const dispatch: Dispatch<any> = useDispatch();
+  const [openMenu, setOpenMenu] = useState(false);
+
+  useEffect(() => {
+    async function fetchAllUsers() {
+      try {
+        const result = await dispatch(fetchUsers());
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchAllUsers();
+  }, []);
 
   const url = window.location.pathname;
-  const id = url.substring(url.lastIndexOf("/") + 1);
+  const id: string = url.substring(url.lastIndexOf("/") + 1);
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards?.find((board) => board._id === id);
   if (!board) return null;
@@ -164,13 +238,13 @@ function BoardDetails() {
                 )}
                 <div>
                   <button
-                    className="w-9 h-9 bg-blue-500 rounded text-white hover:bg-blue-300"
+                    className="w-9 h-9 bg-blue-500 rounded text-white hover:bg-blue-300 focus:outline-none"
                     ref={invitationRef}
                   >
                     <i className="fas fa-plus"></i>
                   </button>
                   <CustomPopover ref={invitationRef}>
-                    <InvitationMenu></InvitationMenu>
+                    <InvitationMenu id={id}></InvitationMenu>
                   </CustomPopover>
                 </div>
               </div>
@@ -179,20 +253,20 @@ function BoardDetails() {
               <GrayButton
                 icon="fas fa-bars"
                 className="items-end"
-                onClick={() => {}}
-                ref={ref}
+                onClick={() => setOpenMenu(true)}
               >
                 <span className="hidden sm:inline">Menu</span>
               </GrayButton>
-              <CustomMenu
-                options={[
-                  {
-                    title: "loesdfsdjsdjfkjsdfkdsjfsdfjskjfks",
-                    onClick: () => alert("hello"),
-                  },
-                ]}
-                ref={ref}
-              ></CustomMenu>
+              <Drawer
+                anchor="right"
+                open={openMenu}
+                onClose={() => setOpenMenu(false)}
+              >
+                <BoardMenu
+                  board={board}
+                  onClose={() => setOpenMenu(false)}
+                ></BoardMenu>
+              </Drawer>
             </div>
           </div>
           <div className="bg-blue-50 w-full h-full rounded-t-3xl space-x-5 grid grid-cols-5   px-5 pt-5">

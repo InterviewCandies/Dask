@@ -10,7 +10,7 @@ import { StateTypes } from "../../types";
 
 const AllBoards: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const email = useSelector((state: StateTypes) => state.authentication.email);
+  const email = useSelector((state: StateTypes) => state.user.email);
   const boards = useSelector((state: StateTypes) => state.boards);
   const history = useHistory();
 
@@ -19,7 +19,6 @@ const AllBoards: React.FC = () => {
     const fetchBoards = async () => {
       try {
         const result = await dispatch(fetchBoardsByEmail(email));
-        console.log(result);
       } catch (error) {
         console.log(error);
       }

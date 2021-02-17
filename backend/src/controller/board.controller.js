@@ -42,7 +42,6 @@ class BoardController {
       lists,
       _id,
     } = req.body;
-    console.log(title, visibility, coverURL, owner, members, lists, _id);
     Board.findOneAndUpdate(
       { _id: ObjectId(_id) },
       { title, visibility, coverURL, members, owner, lists },

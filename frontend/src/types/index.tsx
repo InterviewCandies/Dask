@@ -21,14 +21,16 @@ export interface Board {
 }
 
 export interface StateTypes {
-  authentication: User;
+  user: User;
   boards: Board[];
+  users: User[];
 }
 
 export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
 export const GET_BOARDS_BY_USER = "GET_BOARDS_BY_USER";
 export const UPDATE_BOARDS = "UPDATE_BOARDS";
 export const ADD_BOARD = "ADD_BOARD";
+export const UPDATE_USERS = "UPDATE_USERS";
 export const AUTH_TOKEN = "AUTH_TOKEN";
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_CARD = 3;
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_BOARD = 2;
@@ -57,8 +59,14 @@ interface AddBoard {
   payload: Board;
 }
 
+interface UpdateUsers {
+  type: typeof UPDATE_USERS;
+  payload: User[];
+}
+
 export type ActionTypes =
   | AuthenticateAction
   | GetBoardsByUser
   | UpdateBoards
-  | AddBoard;
+  | AddBoard
+  | UpdateUsers;

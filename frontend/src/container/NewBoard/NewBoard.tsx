@@ -22,7 +22,7 @@ function NewBoard(props: { handleClose: Function }) {
   const fileRef = useRef();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState();
-  const user = useSelector((state: StateTypes) => state.authentication);
+  const user = useSelector((state: StateTypes) => state.user);
   // create a preview as a side effect, whenever selected file is changed
   // Reference: https://stackoverflow.com/a/57781164/14480038
 

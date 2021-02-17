@@ -2,7 +2,7 @@ const router = require("express").Router();
 const Controller = require("../controller").UserController;
 const controller = new Controller();
 
-router.get("/", (req, res) => {});
+router.get("/", controller.get);
 
 router.get("/:id", (req, res) => {});
 

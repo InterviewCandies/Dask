@@ -24,6 +24,15 @@ class UserController {
       })
       .catch(next);
   }
+
+  get(req, res, next) {
+    User.find({})
+      .exec()
+      .then((users) => {
+        res.json(users);
+      })
+      .catch(next);
+  }
 }
 
 module.exports = UserController;
