@@ -41,10 +41,11 @@ class BoardController {
       members,
       lists,
       _id,
+      description,
     } = req.body;
     Board.findOneAndUpdate(
       { _id: ObjectId(_id) },
-      { title, visibility, coverURL, members, owner, lists },
+      { title, visibility, coverURL, members, owner, lists, description },
       (error, result) => {
         if (error) {
           console.log(error);

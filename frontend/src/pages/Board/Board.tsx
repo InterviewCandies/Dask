@@ -1,20 +1,17 @@
-import { useSnackbar } from "notistack";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Drawer } from "@material-ui/core";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
-import { updateBoards } from "../../actions/board";
-import { updateBoard } from "../../api/board";
 import { fetchUsers } from "../../api/user";
-import { Drawer } from "@material-ui/core";
 import Avatars from "../../components/Avatars/Avatars";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
 import Layout from "../../components/common/Layout/Layout";
 import Loader from "../../components/common/Loader/Loader";
 import Searchbar from "../../components/common/Searchbar/Searchbar";
-import CustomMenu from "../../components/CustomMenu/CustomMenu";
 import CustomPopover from "../../components/CustomPopover/CustomPopover";
 import TaskList from "../../components/TaskList/TaskList";
 import BoardMenu from "../../container/BoardMenu/BoardMenu";
+import useUpdateBoard from "../../hooks/useUpdateBoard";
 import {
   Board,
   DEFAULT_AVATAR,
@@ -33,28 +30,16 @@ const VisilityMenu = ({
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards.find((board) => board._id === id);
   const [loading, setLoading] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
-  const dispatch: Dispatch<any> = useDispatch();
-
-  const updateVisibility = useCallback(
-    (boards) => dispatch(updateBoards(boards)),
-    [dispatch]
-  );
+  const { saveChangesToBoard } = useUpdateBoard();
 
   const handleClick = async (status: Boolean) => {
     setLoading(true);
-    const result = await updateBoard({
-      ...board,
-      visibility: status,
-    } as any);
-    if (result.status) {
-      enqueueSnackbar(result.message, { variant: "error" });
-      setLoading(false);
-      return;
-    } else enqueueSnackbar("Board is updated", { variant: "success" });
-    if (board && board.visibility != undefined) board.visibility = status;
-    updateVisibility([...boards]);
-    if (closePopover) closePopover();
+    const newBoard = { ...board, visibility: status };
+    const result = await saveChangesToBoard(
+      newBoard as Board,
+      "Board is updated"
+    );
+    if (!result.status && closePopover) closePopover();
     setLoading(false);
   };
 
@@ -105,36 +90,22 @@ const UserItem = ({ user, id }: { user: User; id: string }) => {
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards.find((board) => board._id === id);
   const [loading, setLoading] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
-  const dispatch = useDispatch();
-
-  const updateMembers = useCallback(
-    (board: Board[]) => {
-      dispatch(updateBoards(board));
-    },
-    [dispatch]
-  );
-
+  const { saveChangesToBoard } = useUpdateBoard();
   const addToBoard = async () => {
     setLoading(true);
-    const result = await updateBoard({
+    const newBoard = {
       ...board,
       members: [...(board?.members as []), { ...user }],
-    } as any);
-    if (result.status) {
-      enqueueSnackbar(result.message, { variant: "error" });
-      setLoading(false);
-      return;
-    } else
-      enqueueSnackbar(`${user.email} has been added to board`, {
-        variant: "success",
-      });
-    board?.members?.push({ ...user });
-    updateMembers([...boards]);
+    };
+    await saveChangesToBoard(
+      newBoard as Board,
+      `${user.email} is added to board`
+    );
     setLoading(false);
   };
   return (
     <>
+      {loading && <Loader title="Processing..."></Loader>}
       <div className="flex  space-y-2 justify-between items-center text-left  hover:bg-gray-100 rounded p-2">
         <div className="flex  items-center">
           <img
@@ -150,7 +121,6 @@ const UserItem = ({ user, id }: { user: User; id: string }) => {
           <i className="fas fa-plus text-xs"></i>
         </button>
       </div>
-      {loading && <Loader title="Processing..."></Loader>}
     </>
   );
 };

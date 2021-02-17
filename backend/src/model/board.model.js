@@ -20,6 +20,14 @@ const Board = new Schema({
   owner: {
     type: String,
   },
+  createdDate: {
+    type: Date,
+    default: Date.now(),
+  },
+  description: {
+    type: String,
+    default: "No description",
+  },
 });
 
 module.exports = mongoose.model("Board", Board);

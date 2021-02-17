@@ -18,6 +18,8 @@ export interface Board {
   members?: User[];
   visibility: Boolean;
   owner?: string | undefined;
+  createdDate?: Date;
+  description: string;
 }
 
 export interface StateTypes {

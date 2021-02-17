@@ -1,9 +1,7 @@
-import { useSnackbar } from "notistack";
-import React, { useCallback, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateBoards } from "../../actions/board";
-import { updateBoard } from "../../api/board";
+import React, { useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import Loader from "../../components/common/Loader/Loader";
+import useUpdateBoard from "../../hooks/useUpdateBoard";
 import { Board, DEFAULT_AVATAR, StateTypes, User } from "../../types";
 
 const UserItem = ({
@@ -18,42 +16,22 @@ const UserItem = ({
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards.find((board) => board._id === id);
   const [loading, setLoading] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
-  const dispatch = useDispatch();
-
-  const updateMembers = useCallback(
-    (board: Board[]) => {
-      dispatch(updateBoards(board));
-    },
-    [dispatch]
-  );
+  const { saveChangesToBoard } = useUpdateBoard();
 
   const removeFromBoard = async () => {
     setLoading(true);
-    const result = await updateBoard({
+    const newBoard = {
       ...board,
       members: [
         ...(board?.members as User[]).filter(
           (member) => member.email != user.email
         ),
       ],
-    } as any);
-    if (result.status) {
-      enqueueSnackbar(result.message, { variant: "error" });
-      setLoading(false);
-      return;
-    } else
-      enqueueSnackbar(`${user.email} has been added to board`, {
-        variant: "success",
-      });
-    if (board && board.members) {
-      board.members = [
-        ...(board?.members as User[]).filter(
-          (member) => member.email != user.email
-        ),
-      ];
-    }
-    updateMembers([...boards]);
+    };
+    await saveChangesToBoard(
+      newBoard as Board,
+      `${user.email} has been removed from board`
+    );
     setLoading(false);
   };
 
@@ -69,7 +47,7 @@ const UserItem = ({
         </div>
         {owner !== user.email ? (
           <button
-            className="bg-red-500 text-white rounded-full  focus:outline-none w-6 h-6 flex items-center justify-center  font-semibold m-0"
+            className="ring-red-500 ring-2 text-red-500 hover:bg-red-100 rounded-full  focus:outline-none w-5 h-5 flex items-center justify-center  font-semibold m-0"
             onClick={removeFromBoard}
           >
             <i className="fas fa-minus text-xs"></i>
@@ -90,8 +68,28 @@ const displayUsers = (users: User[], id: string, owner: string) => {
 };
 
 function BoardMenu({ board, onClose }: { board: Board; onClose: () => void }) {
+  const [edit, setEdit] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const descriptionRef = useRef();
+  const { saveChangesToBoard } = useUpdateBoard();
+
+  const handleSaveDescription = async () => {
+    setLoading(true);
+    if (descriptionRef.current) {
+      const description =
+        (descriptionRef.current as any).value.trim() || "No description";
+      const newBoard = { ...board, description };
+      const result = await saveChangesToBoard(
+        newBoard,
+        "Description has been updated"
+      );
+      if (!result.status) setEdit(false);
+    }
+    setLoading(false);
+  };
   return (
     <div className="bg-white w-80 p-4 space-y-6">
+      {loading && <Loader></Loader>}
       <div className="flex justify-between items-center">
         <h1 className="font-bold">Menu</h1>
         <i
@@ -111,24 +109,62 @@ function BoardMenu({ board, onClose }: { board: Board; onClose: () => void }) {
           ></img>
           <div>
             <h1 className="text-sm font-bold">{board.owner}</h1>
-            <h1 className="text-xs text-gray-500">{Date.now()}</h1>
+            <h1 className="text-xs text-gray-500">
+              on{" "}
+              {board.createdDate &&
+                new Date(board.createdDate)
+                  .toJSON()
+                  .slice(0, 10)
+                  .split("-")
+                  .reverse()
+                  .join("/")}
+            </h1>
           </div>
         </div>
       </div>
       <div className="space-y-3">
-        <h1 className="text-xs text-gray-600 font-semibold">
-          <i className="fas fa-file-alt mr-2"></i> Description
-        </h1>
-        <p className="text-sm m-0">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero iure
-          esse nisi, molestiae distinctio consequuntur perferendis mollitia
-          exercitationem itaque. Maxime mollitia, corrupti enim maiores saepe
-          provident quis neque illum velit?
-        </p>
+        <div className="flex space-x-3 text-xs items-center">
+          <h1 className="text-xs text-gray-600 font-semibold">
+            <i className="fas fa-file-alt mr-2"></i> Description
+          </h1>
+          <button
+            className="ring-1 ring-gray-300  hover:bg-gray-100 focus:outline-none text-gray-500 bg-white py-1 px-3 rounded-lg"
+            onClick={() => setEdit((prevState) => !prevState)}
+          >
+            <i className="fas fa-edit mr-2"></i>Edit
+          </button>
+        </div>
+        {edit ? (
+          <div>
+            <textarea
+              ref={descriptionRef as any}
+              className="ring-2 ring-gray-200 rounded-lg w-full focus:outline-none"
+              style={{ padding: "0.5rem" }}
+            >
+              {board.description}
+            </textarea>
+            <div className="flex space-x-2 mt-2">
+              <button
+                className="bg-green-600 font-semibold text-white px-3 py-1 rounded-xl focus:outline-none hover:bg-green-500"
+                onClick={handleSaveDescription}
+              >
+                Save
+              </button>
+              <button
+                className="px-2 py-1 rounded-xl focus:outline-none   hover:font-semibold hover:bg-gray-100"
+                onClick={() => setEdit(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm m-0">{board.description}</p>
+        )}
       </div>
       <div className="space-y-3">
         <h1 className="text-xs text-gray-600 font-semibold">
-          <i className="fas fa-users"></i> Team
+          <i className="fas fa-users mr-2"></i> Team
         </h1>
         <div>
           {board.members &&
