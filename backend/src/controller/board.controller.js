@@ -21,39 +21,41 @@ class BoardController {
       .catch((error) => console.log(error));
   }
 
-  get(req, res) {
+  get(req, res, next) {
     const { user } = req.query;
-    Board.find({ owner: user }, (error, boards) => {
-      if (error) {
-        console.log(error);
-      } else {
-        res.json(boards);
-      }
-    });
+    Board.find({ owner: user })
+      .exec()
+      .then((boards) => res.json(boards))
+      .catch(next);
   }
 
-  update(req, res) {
+  update(req, res, next) {
     const {
       title,
       visibility,
       coverURL,
       owner,
       members,
-      lists,
       _id,
       description,
+      lists,
     } = req.body;
+    console.log(lists);
     Board.findOneAndUpdate(
       { _id: ObjectId(_id) },
-      { title, visibility, coverURL, members, owner, lists, description },
-      (error, result) => {
-        if (error) {
-          console.log(error);
-        } else {
-          res.json({ message: "successfully" });
-        }
+      {
+        title,
+        visibility,
+        coverURL,
+        members,
+        owner,
+        lists: [...lists],
+        description,
       }
-    );
+    )
+      .exec()
+      .then(() => res.json({ message: "successfully" }))
+      .catch(next);
   }
 }
 

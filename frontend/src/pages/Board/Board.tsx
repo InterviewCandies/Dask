@@ -1,7 +1,9 @@
 import { Drawer } from "@material-ui/core";
+import { useSnackbar } from "notistack";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
+import { createList } from "../../api/list/list";
 import { fetchUsers } from "../../api/user";
 import Avatars from "../../components/Avatars/Avatars";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
@@ -160,6 +162,9 @@ function BoardDetails() {
   const invitationRef = useRef(null);
   const dispatch: Dispatch<any> = useDispatch();
   const [openMenu, setOpenMenu] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { saveChangesToBoard } = useUpdateBoard();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     async function fetchAllUsers() {
@@ -171,6 +176,23 @@ function BoardDetails() {
     }
     fetchAllUsers();
   }, []);
+
+  const addNewList = async () => {
+    setLoading(true);
+    const result = await createList({ title: "Untitle", tasks: [] });
+    if (result.status) {
+      enqueueSnackbar(result.message, { variant: "error" });
+      return;
+    }
+    await saveChangesToBoard(
+      {
+        ...board,
+        lists: [...(board?.lists as []), { ...result.data }],
+      } as Board,
+      "New list is added to board"
+    );
+    setLoading(false);
+  };
 
   const url = window.location.pathname;
   const id: string = url.substring(url.lastIndexOf("/") + 1);
@@ -240,8 +262,18 @@ function BoardDetails() {
             </div>
           </div>
           <div className="bg-blue-50 w-full h-full rounded-t-3xl space-x-5 grid grid-cols-5   px-5 pt-5">
-            <TaskList></TaskList>
-            <TaskList></TaskList>
+            {board.lists?.map((list) => (
+              <TaskList key={list._id} board={board} list={list}></TaskList>
+            ))}
+            <div>
+              <button
+                className="bg-blue-100 p-2   focus:outline-none rounded-xl text-blue-500 flex justify-between items-center w-full"
+                onClick={addNewList}
+              >
+                <span>Add new list</span>
+                <i className="fas fa-plus"></i>
+              </button>
+            </div>
           </div>
         </div>
       </Layout>

@@ -20,12 +20,32 @@ export interface Board {
   owner?: string | undefined;
   createdDate?: Date;
   description: string;
+  lists?: List[];
+}
+
+export interface List {
+  _id?: string;
+  title: string;
+  tasks: Task[];
+}
+
+export interface Task {
+  _id?: string;
+  title: string;
+  tags?: [];
+  comments?: [];
+  members?: [];
+  coverURL?: string;
+  description?: string;
+  files?: [];
+  source?: string;
 }
 
 export interface StateTypes {
   user: User;
   boards: Board[];
   users: User[];
+  lists: List[];
 }
 
 export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
@@ -33,7 +53,10 @@ export const GET_BOARDS_BY_USER = "GET_BOARDS_BY_USER";
 export const UPDATE_BOARDS = "UPDATE_BOARDS";
 export const ADD_BOARD = "ADD_BOARD";
 export const UPDATE_USERS = "UPDATE_USERS";
+export const UPDATE_LISTS = "UPDATE_LISTS";
+export const ADD_TO_LISTS = "ADD_TO_LISTS";
 export const AUTH_TOKEN = "AUTH_TOKEN";
+
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_CARD = 3;
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_BOARD = 2;
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_TASK = 1;
@@ -66,9 +89,21 @@ interface UpdateUsers {
   payload: User[];
 }
 
+interface UpdateLists {
+  type: typeof UPDATE_LISTS;
+  payload: List[];
+}
+
+interface AddToLists {
+  type: typeof ADD_TO_LISTS;
+  payload: List;
+}
+
 export type ActionTypes =
   | AuthenticateAction
   | GetBoardsByUser
   | UpdateBoards
   | AddBoard
-  | UpdateUsers;
+  | UpdateUsers
+  | UpdateLists
+  | AddToLists;
