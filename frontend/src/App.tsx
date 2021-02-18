@@ -15,6 +15,8 @@ import Register from "./pages/Register/Register";
 import { SnackbarProvider } from "notistack";
 import { AUTH_TOKEN } from "./types";
 import Board from "./pages/Board/Board";
+import DialogProvider from "./provider/DialogProvider";
+import useLoader from "./hooks/useLoader";
 
 const PrivateRoute: React.FC<RouteProps> = ({
   component: Component,
@@ -39,24 +41,26 @@ function App() {
   return (
     <Provider store={store}>
       <SnackbarProvider maxSnack={1}>
-        <Router>
-          <Switch>
-            <Route path="/" component={Login} exact></Route>
-            <Route path="/register" exact component={Register}></Route>
-            <PrivateRoute
-              path="/all"
-              component={AllBoards}
-              exact
-            ></PrivateRoute>
-            <PrivateRoute
-              path="/board/:id"
-              component={Board}
-              exact
-            ></PrivateRoute>
-            <PrivateRoute path="/404" component={Page404}></PrivateRoute>
-            <Redirect to="/404"></Redirect>
-          </Switch>
-        </Router>
+        <DialogProvider>
+          <Router>
+            <Switch>
+              <Route path="/" component={Login} exact></Route>
+              <Route path="/register" exact component={Register}></Route>
+              <PrivateRoute
+                path="/all"
+                component={AllBoards}
+                exact
+              ></PrivateRoute>
+              <PrivateRoute
+                path="/board/:id"
+                component={Board}
+                exact
+              ></PrivateRoute>
+              <PrivateRoute path="/404" component={Page404}></PrivateRoute>
+              <Redirect to="/404"></Redirect>
+            </Switch>
+          </Router>
+        </DialogProvider>
       </SnackbarProvider>
     </Provider>
   );

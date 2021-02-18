@@ -11,6 +11,8 @@ import CustomMenu from "../CustomMenu/CustomMenu";
 import { deleteList, updateList } from "../../api/list/list";
 import useUpdateBoard from "../../hooks/useUpdateBoard";
 import { updateLists } from "../../actions/list";
+import { useDialog } from "../../provider/DialogProvider";
+import NewCard from "../../container/NewCard/NewCard";
 const photoURL = undefined;
 
 const members: User[] = [
@@ -60,6 +62,7 @@ function TaskList({ board, list }: { board: Board; list: List }) {
   const { saveChangesToBoard } = useUpdateBoard();
   const [loading, setLoading] = useState(false);
   const [rename, setRename] = useState(false);
+  const [openDialog, closeDialog] = useDialog();
 
   const handleDelete = async () => {
     setLoading(false);
@@ -124,9 +127,17 @@ function TaskList({ board, list }: { board: Board; list: List }) {
           ></CustomMenu>
         </div>
       </div>
-      <TaskCard></TaskCard>
-
-      <button className="bg-blue-100 focus:outline-none p-2 rounded-xl text-blue-500 flex justify-between items-center w-full">
+      {list.tasks.map((task) => (
+        <TaskCard key={task._id}></TaskCard>
+      ))}
+      <button
+        className="bg-blue-100 focus:outline-none p-2 rounded-xl text-blue-500 flex justify-between items-center w-full"
+        onClick={() => {
+          openDialog({
+            children: <NewCard board={board} list={list}></NewCard>,
+          });
+        }}
+      >
         <span>Add another card</span>
         <i className="fas fa-plus"></i>
       </button>
