@@ -1,4 +1,4 @@
-![logo](./img/DASK.png)
+<img src="./img/DASK.png" width="150" height="150">
 
 # Dask
 
