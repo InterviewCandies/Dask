@@ -6,7 +6,7 @@ import { signup } from "../../api/firebase/authentication";
 import Loader from "../../components/common/Loader/Loader";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
 import useGetToken from "../../hooks/useGetToken";
-
+import logo from "../../assets/img/logo.png";
 function Register() {
   const [showButtonGroup, setShowButtonGroup] = useState("");
   const { handleSubmit, register, errors } = useForm();
@@ -22,6 +22,7 @@ function Register() {
   return (
     <div className="w-screen h-screen bg-blue-300 flex justify-center items-center">
       <div className="bg-white h-full sm:h-auto p-8 w-full sm:w-96 rounded shadow-md flex justify-center flex-col">
+        <img src={logo} className="h-10 object-contain"></img>
         <h1 className="font-bold text-gray-500 text-center py-5">
           Sign up for your account
         </h1>

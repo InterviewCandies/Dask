@@ -5,6 +5,7 @@ import { AUTH_TOKEN, DEFAULT_AVATAR, StateTypes, User } from "../../../types";
 import { useSelector } from "react-redux";
 import CustomMenu from "../../CustomMenu/CustomMenu";
 import { useHistory } from "react-router-dom";
+import logo from "../../../assets/img/logo.png";
 
 function Header() {
   const dropdownRef = useRef();
@@ -13,7 +14,7 @@ function Header() {
 
   return (
     <div className="bg-white flex justify-between items-center p-5 flex-col sm:flex-row border-b-2	 border-gray-200">
-      <h1>Logo</h1>
+      <img src={logo} className="h-10 object-contain"></img>
       <div className="flex items-center relative space-x-4  flex-col space-y-2 sm:space-y-0  sm:flex-row">
         <Searchbar></Searchbar>
         <div className="flex items-center space-x-2">

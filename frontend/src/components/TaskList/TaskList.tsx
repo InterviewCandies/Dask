@@ -37,7 +37,7 @@ const TaskCard = () => {
   const [openDialog, closeDialog] = useDialog();
   return (
     <div
-      className="space-y-2 bg-white p-3 rounded-2xl"
+      className="space-y-2 bg-white p-3 rounded-2xl shadow-md"
       onClick={() => openDialog({ children: <TaskDetails></TaskDetails> })}
     >
       {photoURL && (
