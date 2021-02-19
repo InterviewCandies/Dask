@@ -13,6 +13,7 @@ import useUpdateBoard from "../../hooks/useUpdateBoard";
 import { updateLists } from "../../actions/list";
 import { useDialog } from "../../provider/DialogProvider";
 import NewCard from "../../container/NewCard/NewCard";
+import TaskDetails from "../../container/TaskDetails/TaskDetails";
 const photoURL = undefined;
 
 const members: User[] = [
@@ -33,8 +34,12 @@ const Tag = () => {
 };
 
 const TaskCard = () => {
+  const [openDialog, closeDialog] = useDialog();
   return (
-    <div className="space-y-2 bg-white p-3 rounded-2xl">
+    <div
+      className="space-y-2 bg-white p-3 rounded-2xl"
+      onClick={() => openDialog({ children: <TaskDetails></TaskDetails> })}
+    >
       {photoURL && (
         <img src={photoURL} className="h-28 w-full rounded-lg"></img>
       )}
@@ -87,9 +92,15 @@ function TaskList({ board, list }: { board: Board; list: List }) {
     if (result.status) {
       return;
     }
-    const newLists = board.lists?.filter((item) => item._id !== list._id);
+
+    const inx = board.lists?.findIndex((item) => item._id == list._id);
+    const newLists = (board.lists as List[]).filter(
+      (item) => item._id !== list._id
+    );
+    newLists.splice(inx as number, 0, { ...list, title: name });
+
     result = await saveChangesToBoard(
-      { ...board, lists: [...(newLists as []), { ...list, title: name }] },
+      { ...board, lists: [...newLists] },
       `Task list has been renamed to ${name}`
     );
     if (!result.status) setRename(false);

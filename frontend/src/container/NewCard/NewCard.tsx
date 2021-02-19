@@ -27,16 +27,19 @@ function NewCard({ board, list }: { board: Board; list: List }) {
       setLoading(false);
       return;
     }
-    const otherLists = (board.lists as List[]).filter(
+    const inx = board.lists?.findIndex((item) => item._id == list._id);
+    const newLists = (board.lists as List[]).filter(
       (item) => item._id !== list._id
     );
+    newLists.splice(inx as number, 0, {
+      ...list,
+      tasks: [...list.tasks, { ...result.data }],
+    });
+
     result = await saveChangesToBoard(
       {
         ...board,
-        lists: [
-          ...otherLists,
-          { ...list, tasks: [...list.tasks, { ...result.data }] },
-        ],
+        lists: [...newLists],
       },
       `A new card has been added to ${list.title}`
     );
@@ -53,14 +56,15 @@ function NewCard({ board, list }: { board: Board; list: List }) {
         className="bg-white p-5 flex flex-col space-y-5 pt-7 w-80 relative"
         onSubmit={handleSubmit(onSubmit)}
       >
+        <h1 className="font-bold text-center text-lg uppercase">new task</h1>
         <input
-          className="rounded focus:ring-blue-500 ring-2 ring-gray-300 p-2 focus:outline-none"
+          className="rounded focus:ring-blue-500 ring-2 ring-gray-300 p-2 bg-gray-200 focus:outline-none"
           placeholder="Add card title"
           name="title"
           ref={register}
         ></input>
         <input
-          className="rounded focus:ring-blue-500 ring-2 ring-gray-300 p-2 focus:outline-none h-20"
+          className="rounded focus:ring-blue-500 ring-2 ring-gray-300  bg-gray-200 p-2 focus:outline-none h-20"
           placeholder="Add card description"
           name="description"
           ref={register}

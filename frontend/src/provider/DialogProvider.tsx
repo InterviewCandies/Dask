@@ -26,9 +26,29 @@ type DialogContainerProps = DialogParams & {
 
 function DialogContainer(props: DialogContainerProps) {
   const { children, open, style, onClose, onKill } = props;
+  const useStyle = makeStyles(() => ({
+    paper: {
+      ...style,
+    },
+    scrollPaper: {
+      height: "auto",
+      alignItems: "start",
+    },
+    container: {
+      height: "auto",
+    },
+  }));
+  const classes = useStyle();
 
   return (
-    <Dialog open={open} onClose={onClose} onExited={onKill}>
+    <Dialog
+      classes={{
+        paper: classes.paper,
+      }}
+      open={open}
+      onClose={onClose}
+      onExited={onKill}
+    >
       {children}
     </Dialog>
   );
