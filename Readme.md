@@ -1,4 +1,4 @@
-![logo](./img/Dask.png)
+![logo](./img/DASK.png)
 
 # Dask
 
@@ -8,15 +8,15 @@ A MERN stack application to manage workloads
 
 ### Login
 
-![login](./img/login.png)
+![login](./img/login.PNG)
 
 ### Home
 
-![home](./img/main.png)
+![home](./img/main.PNG)
 
 ### Board
 
-![board](./img/board.png)
+![board](./img/board.PNG)
 
 ## Technology
 
