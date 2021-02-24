@@ -18,6 +18,10 @@ A MERN stack application to manage workloads
 
 ![board](./img/board.PNG)
 
+### Task
+
+![task](./img/task.PNG)
+
 ## Technology
 
 - Reactjs
