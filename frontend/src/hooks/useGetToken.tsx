@@ -1,3 +1,4 @@
+import { verify } from "../utils/decodeToken";
 import { useSnackbar } from "notistack";
 import { Dispatch, useCallback } from "react";
 import { useDispatch } from "react-redux";
@@ -21,12 +22,18 @@ export default function useGetToken() {
       enqueueSnackbar(result.message, { variant: "error" });
       return;
     }
-    updateUser(result.data);
     result = await createUser(result.data);
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
       return;
     }
+    const user = verify(result.data);
+    if (user.status) {
+      enqueueSnackbar(user.message, { variant: "error" });
+      return;
+    }
+    console.log(user.data);
+    updateUser(user.data);
     localStorage.setItem(AUTH_TOKEN, result.data);
     instance.defaults.headers.common["Authorization"] = "Bearer " + result.data;
     history.push("/all");

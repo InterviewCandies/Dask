@@ -10,6 +10,26 @@ export interface User {
   email: string;
   photoURL?: string;
 }
+export type LabelColors = {
+  backgroundColor: string;
+  fontColor: string;
+};
+
+export type Label = {
+  content: string;
+} & LabelColors;
+
+export const LABEL_COLORS: LabelColors[] = [
+  { backgroundColor: "bg-gray-400", fontColor: "text-gray-600" },
+  { backgroundColor: "bg-green-400", fontColor: "text-green-600" },
+  { backgroundColor: "bg-blue-400", fontColor: "text-blue-600" },
+  { backgroundColor: "bg-red-400", fontColor: "text-red-600" },
+  { backgroundColor: "bg-yellow-400", fontColor: "text-yellow-600" },
+  { backgroundColor: "bg-purple-400", fontColor: "text-purple-600" },
+  { backgroundColor: "bg-pink-400", fontColor: "text-pink-600" },
+  { backgroundColor: "bg-indigo-400", fontColor: "text-indigo-600" },
+  { backgroundColor: "bg-black", fontColor: "text-white" },
+];
 
 export interface Board {
   title: string;
@@ -32,8 +52,8 @@ export interface List {
 export interface Task {
   _id?: string;
   title: string;
-  tags?: [];
-  comments?: [];
+  tags?: Label[];
+  comments?: CommentType[];
   members?: [];
   coverURL?: string;
   description?: string;
@@ -41,11 +61,19 @@ export interface Task {
   source?: string;
 }
 
+export interface CommentType {
+  _id?: string;
+  author: User;
+  content: string;
+  createdDate?: Date;
+}
+
 export interface StateTypes {
   user: User;
   boards: Board[];
   users: User[];
   lists: List[];
+  task: Task;
 }
 
 export const AUTHENTICATE_USER = "AUTHENTICATE_USER";
@@ -56,6 +84,7 @@ export const UPDATE_USERS = "UPDATE_USERS";
 export const UPDATE_LISTS = "UPDATE_LISTS";
 export const ADD_TO_LISTS = "ADD_TO_LISTS";
 export const AUTH_TOKEN = "AUTH_TOKEN";
+export const UPDATE_CURRENT_TASK = "UPDATE_CURRENT_TASK";
 
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_CARD = 3;
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_BOARD = 2;
@@ -63,7 +92,8 @@ export const MAXIMUM_MEMBERS_DISPLAYED_PER_TASK = 1;
 export const DEFAULT_AVATAR = avatar;
 export const DEFAULT_BOARD_COVER =
   "https://images.unsplash.com/photo-1486520299386-6d106b22014b?ixid=MXwxMjA3fDB8MHxzZWFyY2h8NHx8Ymx1ZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60";
-
+export const DEFAULT_TASK_COVER =
+  "https://images.unsplash.com/photo-1539678955859-9f368343753f?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxleHBsb3JlLWZlZWR8N3x8fGVufDB8fHw%3D&auto=format&fit=crop&w=500&q=60";
 interface AuthenticateAction {
   type: typeof AUTHENTICATE_USER;
   payload: User;
@@ -99,6 +129,11 @@ interface AddToLists {
   payload: List;
 }
 
+interface UpdateCurrentTask {
+  type: typeof UPDATE_CURRENT_TASK;
+  payload: Task;
+}
+
 export type ActionTypes =
   | AuthenticateAction
   | GetBoardsByUser
@@ -106,4 +141,5 @@ export type ActionTypes =
   | AddBoard
   | UpdateUsers
   | UpdateLists
+  | UpdateCurrentTask
   | AddToLists;

@@ -6,6 +6,7 @@ import {
   Task,
   List,
   Board,
+  DEFAULT_BOARD_COVER,
 } from "../../types";
 import CustomMenu from "../CustomMenu/CustomMenu";
 import { deleteList, updateList } from "../../api/list/list";
@@ -14,16 +15,6 @@ import { updateLists } from "../../actions/list";
 import { useDialog } from "../../provider/DialogProvider";
 import NewCard from "../../container/NewCard/NewCard";
 import TaskDetails from "../../container/TaskDetails/TaskDetails";
-const photoURL = undefined;
-
-const members: User[] = [
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-  { photoURL: "", email: "" },
-];
 
 const Tag = () => {
   return (
@@ -33,24 +24,26 @@ const Tag = () => {
   );
 };
 
-const TaskCard = () => {
+const TaskCard = ({ task }: { task: Task }) => {
   const [openDialog, closeDialog] = useDialog();
   return (
     <div
       className="space-y-2 bg-white p-3 rounded-2xl shadow-md"
-      onClick={() => openDialog({ children: <TaskDetails></TaskDetails> })}
+      onClick={() =>
+        openDialog({ children: <TaskDetails task={task}></TaskDetails> })
+      }
     >
-      {photoURL && (
-        <img src={photoURL} className="h-28 w-full rounded-lg"></img>
+      {task.coverURL && (
+        <img
+          src={task.coverURL || DEFAULT_BOARD_COVER}
+          className="h-28 w-full rounded-lg"
+        ></img>
       )}
-      <h1 className="text-lg font-semibold">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam vero
-        deserunt tempore enim dolor magni perspiciatis quia numquam nihil amet!
-      </h1>
+      <h1 className="text-lg font-semibold">{task.title}</h1>
       <Tag></Tag>
       <div className="flex space-x-2 items-center">
         <Avatars
-          members={members}
+          members={task.members as []}
           limit={MAXIMUM_MEMBERS_DISPLAYED_PER_TASK}
         ></Avatars>
         <button className="w-9 h-9 bg-blue-500 rounded text-white hover:bg-blue-300">
@@ -139,7 +132,7 @@ function TaskList({ board, list }: { board: Board; list: List }) {
         </div>
       </div>
       {list.tasks.map((task) => (
-        <TaskCard key={task._id}></TaskCard>
+        <TaskCard key={task._id} task={task}></TaskCard>
       ))}
       <button
         className="bg-blue-100 focus:outline-none p-2 rounded-xl text-blue-500 flex justify-between items-center w-full"

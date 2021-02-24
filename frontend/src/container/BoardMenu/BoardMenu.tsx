@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import Loader from "../../components/common/Loader/Loader";
 import useUpdateBoard from "../../hooks/useUpdateBoard";
 import { Board, DEFAULT_AVATAR, StateTypes, User } from "../../types";
+import { formatDate } from "../../utils/formatDate";
 
 const UserItem = ({
   owner,
@@ -70,7 +71,7 @@ const displayUsers = (users: User[], id: string, owner: string) => {
 function BoardMenu({ board, onClose }: { board: Board; onClose: () => void }) {
   const [edit, setEdit] = useState(false);
   const [loading, setLoading] = useState(false);
-  const descriptionRef = useRef();
+  const descriptionRef = useRef(null);
   const { saveChangesToBoard } = useUpdateBoard();
 
   const handleSaveDescription = async () => {
@@ -110,14 +111,7 @@ function BoardMenu({ board, onClose }: { board: Board; onClose: () => void }) {
           <div>
             <h1 className="text-sm font-bold">{board.owner}</h1>
             <h1 className="text-xs text-gray-500">
-              on{" "}
-              {board.createdDate &&
-                new Date(board.createdDate)
-                  .toJSON()
-                  .slice(0, 10)
-                  .split("-")
-                  .reverse()
-                  .join("/")}
+              on {board.createdDate && formatDate(board.createdDate)}
             </h1>
           </div>
         </div>

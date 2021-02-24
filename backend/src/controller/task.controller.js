@@ -12,6 +12,14 @@ class TaskController {
       .catch(next);
   }
 
+  getById(req, res, next) {
+    const { id } = req.params;
+    Task.findById(id)
+      .exec()
+      .then((task) => res.json(task))
+      .catch(next);
+  }
+
   update(req, res, next) {
     const {
       title,
