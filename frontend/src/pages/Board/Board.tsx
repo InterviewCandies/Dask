@@ -261,7 +261,7 @@ function BoardDetails() {
               </Drawer>
             </div>
           </div>
-          <div className="bg-blue-50 w-full h-full rounded-t-3xl space-x-5 grid grid-cols-5   px-5 pt-5">
+          <div className="bg-blue-50 w-full h-full rounded-t-3xl flex flex-nowrap gap-4	 px-5 pt-5 overflow-auto">
             {board.lists?.map((list) => (
               <TaskList key={list._id} board={board} list={list}></TaskList>
             ))}
@@ -269,6 +269,7 @@ function BoardDetails() {
               <button
                 className="bg-blue-100 p-2   focus:outline-none rounded-xl text-blue-500 flex justify-between items-center w-full"
                 onClick={addNewList}
+                style={{ width: "220px" }}
               >
                 <span>Add new list</span>
                 <i className="fas fa-plus"></i>

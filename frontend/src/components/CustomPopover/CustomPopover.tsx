@@ -8,7 +8,8 @@ const CustomPopover = React.forwardRef(
       //@ts-ignore
       if (ref && ref.current) {
         //@ts-ignore
-        ref.current.onclick = () => {
+        ref.current.onclick = (e) => {
+          e.stopPropagation();
           //@ts-ignore
           setAnchorEl(ref.current);
         };

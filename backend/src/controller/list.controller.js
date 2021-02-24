@@ -1,4 +1,5 @@
 const List = require("../model/list.model");
+const Task = require("../model/task.model");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 class ListController {
@@ -24,11 +25,12 @@ class ListController {
     const { id } = req.params;
     List.deleteOne({ _id: ObjectId(id) })
       .exec()
-      .then((result) =>
+      .then((result) => {
+        console.log(result);
         res.json({
           message: "successfully",
-        })
-      )
+        });
+      })
       .catch(next);
   }
 

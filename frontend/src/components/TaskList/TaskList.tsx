@@ -15,11 +15,15 @@ import useUpdateBoard from "../../hooks/useUpdateBoard";
 import { useDialog } from "../../provider/DialogProvider";
 import NewCard from "../../container/NewCard/NewCard";
 import TaskDetails from "../../container/TaskDetails/TaskDetails";
+import CustomPopover from "../CustomPopover/CustomPopover";
+import Assignment from "../Assignment/Assignment";
+import useUpdateCurrentTask from "../../hooks/useUpdateCurrentTask";
+import { updateTask } from "../../api/task/task";
 
 const Tag = ({ tag }: { tag: Label }) => {
   return (
     <div
-      className={`py-1 px-2  ${tag.backgroundColor}  ${tag.fontColor}  focus:outline-none text-xs rounded-full w-min`}
+      className={`py-1 px-2  ${tag.backgroundColor}  ${tag.fontColor}  focus:outline-none text-xs rounded-full text-center`}
     >
       {tag.content}
     </div>
@@ -28,36 +32,48 @@ const Tag = ({ tag }: { tag: Label }) => {
 
 const TaskCard = ({ task }: { task: Task }) => {
   const [openDialog, closeDialog] = useDialog();
+  const assignmentRef = useRef(null);
   return (
-    <div
-      className="space-y-2 bg-white p-3 rounded-2xl shadow-md"
-      onClick={() =>
-        openDialog({ children: <TaskDetails task={task}></TaskDetails> })
-      }
-    >
-      {task.coverURL && (
-        <img
-          src={task.coverURL || DEFAULT_BOARD_COVER}
-          className="h-28 w-full rounded-lg"
-        ></img>
-      )}
-      <h1 className="text-lg font-semibold">{task.title}</h1>
-      <div className="flex flex-wrap space-x-1 space-y-1">
-        {task.tags?.map((tag) => (
-          <Tag tag={tag} key={tag.content}></Tag>
-        ))}
-      </div>
+    <>
+      <div
+        className="space-y-2 bg-white p-3 rounded-2xl shadow-md w-full"
+        onClick={(e) => {
+          e.stopPropagation();
+          openDialog({ children: <TaskDetails task={task}></TaskDetails> });
+        }}
+      >
+        {task.coverURL && (
+          <img
+            src={task.coverURL || DEFAULT_BOARD_COVER}
+            className="h-28 w-full rounded-lg"
+          ></img>
+        )}
+        <h1 className="text-lg font-semibold word-wrap break-words">
+          {task.title}
+        </h1>
+        <div className="flex flex-wrap space-x-1 space-y-1">
+          {task.tags?.map((tag) => (
+            <Tag tag={tag} key={tag.content}></Tag>
+          ))}
+        </div>
 
-      <div className="flex space-x-2 items-center">
-        <Avatars
-          members={task.members as []}
-          limit={MAXIMUM_MEMBERS_DISPLAYED_PER_TASK}
-        ></Avatars>
-        <button className="w-8 h-8 focus:outline-none bg-blue-500 rounded text-white hover:bg-blue-300">
-          <i className="fas fa-plus"></i>
-        </button>
+        <div className="flex space-x-2 items-center">
+          <Avatars
+            members={task.members as []}
+            limit={MAXIMUM_MEMBERS_DISPLAYED_PER_TASK}
+          ></Avatars>
+          <button
+            className="w-8 h-8 focus:outline-none bg-blue-500 rounded text-white hover:bg-blue-300"
+            ref={assignmentRef}
+          >
+            <i className="fas fa-plus"></i>
+          </button>
+        </div>
       </div>
-    </div>
+      <CustomPopover ref={assignmentRef}>
+        <Assignment task={task}></Assignment>
+      </CustomPopover>
+    </>
   );
 };
 
@@ -107,7 +123,7 @@ function TaskList({ board, list }: { board: Board; list: List }) {
     setLoading(true);
   };
   return (
-    <div className="h-full space-y-4">
+    <div className="h-full space-y-4" style={{ width: "220px" }}>
       <div className="flex justify-between items-center">
         {rename ? (
           <div className="flex space-x-1 items-center">
@@ -148,6 +164,7 @@ function TaskList({ board, list }: { board: Board; list: List }) {
             children: <NewCard board={board} list={list}></NewCard>,
           });
         }}
+        style={{ width: "220px" }}
       >
         <span>Add another card</span>
         <i className="fas fa-plus"></i>

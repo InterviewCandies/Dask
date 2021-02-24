@@ -47,7 +47,7 @@ function useUpdateCurrentTask() {
     updateReduxTask(newTask);
     return result;
   };
-  return { saveChangesToCurrentTask };
+  return { saveChangesToCurrentTask, updateReduxTask };
 }
 
 export default useUpdateCurrentTask;

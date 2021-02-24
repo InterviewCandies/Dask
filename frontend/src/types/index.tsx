@@ -54,7 +54,7 @@ export interface Task {
   title: string;
   tags?: Label[];
   comments?: CommentType[];
-  members?: [];
+  members?: User[];
   coverURL?: string;
   description?: string;
   files?: [];

@@ -1,29 +1,17 @@
-import userEvent from "@testing-library/user-event";
 import { useSnackbar } from "notistack";
-import { comment } from "postcss";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
-import { updateCurrentTask } from "../../actions/task";
 import { createComment, deleteComment } from "../../api/comment/comment";
-import { fetchTask, updateTask } from "../../api/task/task";
+import { fetchTask } from "../../api/task/task";
+import Assignment from "../../components/Assignment/Assignment";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
-import Searchbar from "../../components/common/Searchbar/Searchbar";
 import CustomPopover from "../../components/CustomPopover/CustomPopover";
 import LabelGenerator from "../../components/LabelGenerator/LabelGenerator";
-import useUpdateBoard from "../../hooks/useUpdateBoard";
 import useUpdateCurrentTask from "../../hooks/useUpdateCurrentTask";
 import { useDialog } from "../../provider/DialogProvider";
-import {
-  CommentType,
-  DEFAULT_AVATAR,
-  DEFAULT_TASK_COVER,
-  Label,
-  StateTypes,
-  Task,
-  User,
-} from "../../types";
+import { CommentType, DEFAULT_AVATAR, StateTypes, Task } from "../../types";
 import { errorHandler } from "../../utils/errorHandler";
 import { formatDate } from "../../utils/formatDate";
 
@@ -186,6 +174,7 @@ function TaskDetails({ task }: { task: Task }) {
   const currentTask: Task = useSelector((state: StateTypes) => state.task);
   const { saveChangesToCurrentTask } = useUpdateCurrentTask();
   const labelRef = useRef(null);
+  const assignmentRef = useRef(null);
 
   const dispatch: Dispatch<any> = useDispatch();
   useEffect(() => {
@@ -334,7 +323,12 @@ function TaskDetails({ task }: { task: Task }) {
                   currentLabels={currentTask.tags as any}
                 ></LabelGenerator>
               </CustomPopover>
-              <GrayButton icon="fas fa-users mr-2">Members</GrayButton>
+              <GrayButton icon="fas fa-users mr-2" ref={assignmentRef}>
+                Members
+              </GrayButton>
+              <CustomPopover ref={assignmentRef}>
+                <Assignment task={currentTask}></Assignment>
+              </CustomPopover>
             </div>
           </div>
         </div>

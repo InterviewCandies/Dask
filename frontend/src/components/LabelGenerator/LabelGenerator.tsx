@@ -22,7 +22,7 @@ const Tag = ({ tag }: { tag: Label }) => {
   return (
     <Tooltip title="Click to remove">
       <button
-        className={`py-1 px-2  ${tag.backgroundColor}  ${tag.fontColor}  focus:outline-none text-xs rounded-full w-min`}
+        className={`py-1 px-2  ${tag.backgroundColor}  ${tag.fontColor} break-words  focus:outline-none text-xs rounded-full w-min`}
         onClick={handleDeleteLabel}
       >
         {tag.content}
@@ -96,10 +96,10 @@ function LabelGenerator({ currentLabels }: { currentLabels: Label[] }) {
       </div>
       <div className="text-center">
         <button
-          className="bg-blue-500 text-white rounded-xl px-5 py-1 focus:outline-none"
+          className="bg-blue-500  font-semibold text-white rounded-xl px-4 py-1 focus:outline-none"
           onClick={handleAddLabel}
         >
-          Add
+          <i className="fas fa-plus mr-2"></i>Add
         </button>
       </div>
     </div>

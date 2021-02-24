@@ -42,6 +42,7 @@ class TaskController {
 
   delete(req, res, next) {
     const { id } = req.params;
+
     Task.deleteOne({ _id: ObjectId(id) })
       .exec()
       .then((result) =>
