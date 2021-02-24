@@ -206,7 +206,7 @@ function BoardDetails() {
       <Layout>
         <div className="bg-white w-full h-screen px-5">
           <div className="bg-white flex mb-5 pt-5 justify-between">
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 items-center">
               <div>
                 <GrayButton
                   icon={visibility ? "fas fa-lock" : "fas fa-globe-asia"}
@@ -230,7 +230,7 @@ function BoardDetails() {
                 )}
                 <div>
                   <button
-                    className="w-9 h-9 bg-blue-500 rounded text-white hover:bg-blue-300 focus:outline-none"
+                    className="w-8 h-8 bg-blue-500 rounded text-white hover:bg-blue-300 focus:outline-none"
                     ref={invitationRef}
                   >
                     <i className="fas fa-plus"></i>

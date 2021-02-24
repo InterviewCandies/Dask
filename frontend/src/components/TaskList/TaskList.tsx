@@ -7,19 +7,21 @@ import {
   List,
   Board,
   DEFAULT_BOARD_COVER,
+  Label,
 } from "../../types";
 import CustomMenu from "../CustomMenu/CustomMenu";
 import { deleteList, updateList } from "../../api/list/list";
 import useUpdateBoard from "../../hooks/useUpdateBoard";
-import { updateLists } from "../../actions/list";
 import { useDialog } from "../../provider/DialogProvider";
 import NewCard from "../../container/NewCard/NewCard";
 import TaskDetails from "../../container/TaskDetails/TaskDetails";
 
-const Tag = () => {
+const Tag = ({ tag }: { tag: Label }) => {
   return (
-    <div className="py-1 px-2 bg-blue-100 text-blue-500 text-xs rounded-full w-min">
-      Techinical
+    <div
+      className={`py-1 px-2  ${tag.backgroundColor}  ${tag.fontColor}  focus:outline-none text-xs rounded-full w-min`}
+    >
+      {tag.content}
     </div>
   );
 };
@@ -40,13 +42,18 @@ const TaskCard = ({ task }: { task: Task }) => {
         ></img>
       )}
       <h1 className="text-lg font-semibold">{task.title}</h1>
-      <Tag></Tag>
+      <div className="flex flex-wrap space-x-1 space-y-1">
+        {task.tags?.map((tag) => (
+          <Tag tag={tag} key={tag.content}></Tag>
+        ))}
+      </div>
+
       <div className="flex space-x-2 items-center">
         <Avatars
           members={task.members as []}
           limit={MAXIMUM_MEMBERS_DISPLAYED_PER_TASK}
         ></Avatars>
-        <button className="w-9 h-9 bg-blue-500 rounded text-white hover:bg-blue-300">
+        <button className="w-8 h-8 focus:outline-none bg-blue-500 rounded text-white hover:bg-blue-300">
           <i className="fas fa-plus"></i>
         </button>
       </div>

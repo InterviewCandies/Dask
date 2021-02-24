@@ -25,9 +25,10 @@ function useUpdateBoard() {
       enqueueSnackbar(result.message, { variant: "error" });
       return result;
     } else
-      enqueueSnackbar(succeedMessage, {
-        variant: "success",
-      });
+      succeedMessage &&
+        enqueueSnackbar(succeedMessage, {
+          variant: "success",
+        });
     let newBoards = boards.filter((item) => item._id !== board._id);
     updateState([...newBoards, { ...board }]);
     return result;

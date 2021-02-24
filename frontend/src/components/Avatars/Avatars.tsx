@@ -4,7 +4,7 @@ import { DEFAULT_AVATAR, User } from "../../types";
 const Avatar = (props: { photoUrl: any }) => {
   return (
     <img
-      className="w-9 h-9 rounded"
+      className="w-8 h-8 rounded"
       src={props.photoUrl || DEFAULT_AVATAR}
     ></img>
   );
@@ -12,7 +12,7 @@ const Avatar = (props: { photoUrl: any }) => {
 
 const Cell = ({ num }: { num: number }) => {
   return (
-    <div className="w-9 h-9 bg-black rounded flex justify-center items-center opacity-30">
+    <div className="w-8 h-8 bg-black rounded flex justify-center items-center opacity-30">
       <p className="text-white">{num}+</p>
     </div>
   );
