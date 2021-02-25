@@ -8,6 +8,7 @@ import {
   Board,
   DEFAULT_BOARD_COVER,
   Label,
+  TASK_COVER,
 } from "../../types";
 import CustomMenu from "../CustomMenu/CustomMenu";
 import { deleteList, updateList } from "../../api/list/list";
@@ -61,7 +62,8 @@ const TaskCard = ({ task }: { task: Task }) => {
       >
         {task.coverURL && (
           <img
-            src={task.coverURL || DEFAULT_BOARD_COVER}
+            //@ts-ignore
+            src={TASK_COVER[task.coverURL]}
             className="h-28 w-full rounded-lg"
           ></img>
         )}

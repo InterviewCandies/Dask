@@ -1,4 +1,13 @@
 import avatar from "../assets/img/avatar.jpg";
+import Cover1 from "../assets/img/cover1.jpg";
+import Cover2 from "../assets/img/cover2.jpg";
+import Cover3 from "../assets/img/cover3.jpg";
+import Cover4 from "../assets/img/cover4.jpg";
+import Cover5 from "../assets/img/cover5.jpg";
+import Cover6 from "../assets/img/cover6.jpg";
+import Cover7 from "../assets/img/cover7.jpg";
+import Cover8 from "../assets/img/cover8.jpg";
+import Cover9 from "../assets/img/cover9.jpg";
 
 export type Message = {
   status?: string;
@@ -30,7 +39,17 @@ export const LABEL_COLORS: LabelColors[] = [
   { backgroundColor: "bg-indigo-400", fontColor: "text-indigo-600" },
   { backgroundColor: "bg-black", fontColor: "text-white" },
 ];
-
+export const TASK_COVER = {
+  cover1: Cover1,
+  cover2: Cover2,
+  cover3: Cover3,
+  cover4: Cover4,
+  cover5: Cover5,
+  cover6: Cover6,
+  cover7: Cover7,
+  cover8: Cover8,
+  cover9: Cover9,
+};
 export interface Board {
   title: string;
   _id: string;
@@ -84,6 +103,7 @@ export const UPDATE_USERS = "UPDATE_USERS";
 export const UPDATE_LISTS = "UPDATE_LISTS";
 export const ADD_TO_LISTS = "ADD_TO_LISTS";
 export const AUTH_TOKEN = "AUTH_TOKEN";
+export const CURRENT_USER = "CURRENT_USER";
 export const UPDATE_CURRENT_TASK = "UPDATE_CURRENT_TASK";
 
 export const MAXIMUM_MEMBERS_DISPLAYED_PER_CARD = 3;

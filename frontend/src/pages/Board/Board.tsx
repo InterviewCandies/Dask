@@ -198,7 +198,8 @@ function BoardDetails() {
   const id: string = url.substring(url.lastIndexOf("/") + 1);
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards?.find((board) => board._id === id);
-  if (!board) return null;
+  console.log(id, board, boards);
+  if (!board) return <h1>Empty</h1>;
   const { visibility, title, members } = board;
 
   return (

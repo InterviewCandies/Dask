@@ -1,7 +1,13 @@
 import React, { useRef } from "react";
 import { Menu, MenuItem } from "@material-ui/core";
 import Searchbar from "../Searchbar/Searchbar";
-import { AUTH_TOKEN, DEFAULT_AVATAR, StateTypes, User } from "../../../types";
+import {
+  AUTH_TOKEN,
+  CURRENT_USER,
+  DEFAULT_AVATAR,
+  StateTypes,
+  User,
+} from "../../../types";
 import { useSelector } from "react-redux";
 import CustomMenu from "../../CustomMenu/CustomMenu";
 import { useHistory } from "react-router-dom";

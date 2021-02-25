@@ -6,14 +6,15 @@ import { fetchBoardsByEmail } from "../../api/board";
 import Card from "../../components/Card/Card";
 import Layout from "../../components/common/Layout/Layout";
 import NewBoard from "../../container/NewBoard/NewBoard";
-import { StateTypes } from "../../types";
+import { useDialog } from "../../provider/DialogProvider";
+import { CURRENT_USER, StateTypes } from "../../types";
 
 const AllBoards: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const email = useSelector((state: StateTypes) => state.user.email);
+  const { email } = useSelector((state: StateTypes) => state.user);
   const boards = useSelector((state: StateTypes) => state.boards);
   const history = useHistory();
-
+  const [openDialog] = useDialog();
   const dispatch = useDispatch();
   useEffect(() => {
     const fetchBoards = async () => {
@@ -31,8 +32,12 @@ const AllBoards: React.FC = () => {
         <div className="flex justify-between items-center pt-10 pb-5">
           <h1 className="font-semibold tracking-wider text-lg">All Boards</h1>
           <button
-            className="p-2 bg-blue-500 rounded-lg text-white focus:outline-none  font-semibold hover:bg-blue-300"
-            onClick={() => setOpen(true)}
+            className="px-4 py-2  p-2 bg-blue-500 rounded-lg text-white focus:outline-none  font-semibold hover:bg-blue-300"
+            onClick={() =>
+              openDialog({
+                children: <NewBoard></NewBoard>,
+              })
+            }
           >
             <i className="fas fa-plus"></i> Add
           </button>
@@ -48,9 +53,6 @@ const AllBoards: React.FC = () => {
             ></Card>
           ))}
         </div>
-        <Dialog open={open} onClose={() => setOpen(false)} className="relative">
-          <NewBoard handleClose={() => setOpen(false)}></NewBoard>
-        </Dialog>
       </div>
     </Layout>
   );

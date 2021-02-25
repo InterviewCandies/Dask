@@ -7,6 +7,7 @@ import { createComment, deleteComment } from "../../api/comment/comment";
 import { deleteTask, fetchTask } from "../../api/task/task";
 import Assignment from "../../components/Assignment/Assignment";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
+import CoverImageMenu from "../../components/CoverImageMenu/CoverImageMenu";
 import CustomPopover from "../../components/CustomPopover/CustomPopover";
 import LabelGenerator from "../../components/LabelGenerator/LabelGenerator";
 import useUpdateBoard from "../../hooks/useUpdateBoard";
@@ -15,10 +16,12 @@ import { useDialog } from "../../provider/DialogProvider";
 import {
   Board,
   CommentType,
+  CURRENT_USER,
   DEFAULT_AVATAR,
   List,
   StateTypes,
   Task,
+  TASK_COVER,
 } from "../../types";
 import { errorHandler } from "../../utils/errorHandler";
 import { formatDate } from "../../utils/formatDate";
@@ -113,7 +116,7 @@ const Comments = ({ comments }: { comments: CommentType[] }) => {
     if (!result.status && contentRef.current) contentRef.current.value = "";
   };
   return (
-    <div className="space-y-4">
+    <div>
       <form
         className="p-4 border-2 border-gray-300 shadow rounded-xl"
         onSubmit={handleSubmit(handleCreateComment)}
@@ -187,6 +190,7 @@ function TaskDetails({ taskId }: { taskId: string }) {
   const { saveChangesToBoard } = useUpdateBoard();
   const labelRef = useRef(null);
   const assignmentRef = useRef(null);
+  const coverRef = useRef(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const url = window.location.pathname;
@@ -255,13 +259,17 @@ function TaskDetails({ taskId }: { taskId: string }) {
         <i className="fas fa-times"></i>
       </button>
       {currentTask.coverURL && (
-        <img src={currentTask.coverURL} className="w-full h-28 rounded"></img>
+        <img
+          //@ts-ignore
+          src={TASK_COVER[currentTask.coverURL]}
+          className="w-full h-28 rounded"
+        ></img>
       )}
       <div>
         <div className="grid md:grid-cols-4 grid-cols-1 space-y-4 md:space-y-0">
-          <div className="space-y-4 mt-4 col-span-3">
+          <div className="space-y-8 mt-4 col-span-3">
             {editTitle ? (
-              <div className="flex space-x-2 items-center">
+              <div className="flex  flex-col space-y-2">
                 <input
                   ref={titleRef as any}
                   className="ring-2 w-full md:w-4/5 my-2 ring-gray-200 rounded-lg  focus:outline-none"
@@ -292,16 +300,14 @@ function TaskDetails({ taskId }: { taskId: string }) {
                   {currentTask.title}
                 </h1>
                 <button
-                  className="ring-1 ring-gray-300  text-xs hover:bg-gray-100 focus:outline-none text-gray-500 bg-white py-1 px-3 rounded-lg"
+                  className="ring-1 ring-gray-300 text-xs hover:bg-gray-100 focus:outline-none text-gray-500 bg-white py-1 px-3 rounded-lg"
                   onClick={() => setEditTitle((prevState) => !prevState)}
                 >
                   <i className="fas fa-edit mr-2"></i>Edit
                 </button>
               </div>
             )}
-            <p className="text-gray-600 text-xs">
-              In list <span className="font-bold">progress</span>
-            </p>
+
             <div className="space-y-3">
               <div className="flex space-x-3 text-xs items-center">
                 <h1 className="text-xs text-gray-600 font-semibold">
@@ -343,22 +349,19 @@ function TaskDetails({ taskId }: { taskId: string }) {
                 </p>
               )}
             </div>
-            <div className="space-y-3">
-              <button
-                className="focus:outline-none px-5 py-1 hover:bg-red-100 ring-red-500 ring-1 text-red-500 rounded-lg"
-                onClick={handleDeleteTask}
-              >
-                <i className="fas fa-trash mr-2"></i> Delete task
-              </button>
-            </div>
           </div>
 
           <div>
             <h1 className="text-xs text-gray-600 font-semibold mb-2">
               <i className="fas fa-tools mr-2"></i> Actions
             </h1>
-            <div className="flex flex-row space-x-2 md:space-x-0 md:flex-col md:space-y-3">
-              <GrayButton icon="fas fa-image mr-2">Cover</GrayButton>
+            <div className="flex flex-wrap flex-row gap-2 md:space-x-0 md:flex-col md:space-y-3">
+              <GrayButton icon="fas fa-image mr-2" ref={coverRef}>
+                Cover
+              </GrayButton>
+              <CustomPopover ref={coverRef}>
+                <CoverImageMenu></CoverImageMenu>
+              </CustomPopover>
               <GrayButton icon="fas fa-tags mr-2" ref={labelRef}>
                 Labels
               </GrayButton>
@@ -373,6 +376,12 @@ function TaskDetails({ taskId }: { taskId: string }) {
               <CustomPopover ref={assignmentRef}>
                 <Assignment task={currentTask}></Assignment>
               </CustomPopover>
+              <button
+                className="focus:outline-none px-2 py-2 hover:bg-red-100 ring-red-500 ring-1 text-red-500 rounded-lg"
+                onClick={handleDeleteTask}
+              >
+                <i className="fas fa-trash mr-2"></i> Delete task
+              </button>
             </div>
           </div>
         </div>

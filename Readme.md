@@ -20,7 +20,7 @@ A MERN stack application to manage workloads
 
 ### Task
 
-![task](./img/task.PNG)
+![task](./img/label.PNG)
 
 ## Technology
 

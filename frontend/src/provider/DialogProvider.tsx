@@ -29,6 +29,7 @@ function DialogContainer(props: DialogContainerProps) {
   const useStyle = makeStyles(() => ({
     paper: {
       ...style,
+      position: "relative",
     },
     scrollPaper: {
       height: "auto",
