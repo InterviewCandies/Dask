@@ -33,10 +33,25 @@ const Tag = ({ tag }: { tag: Label }) => {
 const TaskCard = ({ task }: { task: Task }) => {
   const [openDialog, closeDialog] = useDialog();
   const assignmentRef = useRef(null);
+
+  const handleDragStart = (e: any, id: string) => {
+    e.currentTarget.style.backgroundColor = "#E2E8F6";
+    e.currentTarget.style.border = "dashed 2px #2F80ED";
+
+    console.log("dragstart", id);
+    e.dataTransfer.setData("text/plain", id);
+  };
+
   return (
     <>
       <div
         className="space-y-2 bg-white p-3 rounded-2xl shadow-md w-full"
+        draggable
+        onDragEnd={(e) => {
+          e.currentTarget.style.backgroundColor = "#fff";
+          e.currentTarget.style.border = "none";
+        }}
+        onDragStart={(e) => handleDragStart(e, task._id as string)}
         onClick={(e) => {
           e.stopPropagation();
           openDialog({ children: <TaskDetails task={task}></TaskDetails> });
@@ -122,9 +137,36 @@ function TaskList({ board, list }: { board: Board; list: List }) {
     if (!result.status) setRename(false);
     setLoading(true);
   };
+
+  const handleDrop = async (e: any, endList: List) => {
+    const id = e.dataTransfer.getData("text/plain");
+    const sourceList = (board.lists as List[]).find(
+      (list) => list.tasks.findIndex((task) => task._id === id) >= 0
+    );
+    const targetTask = sourceList?.tasks.find((task) => task._id === id);
+    if (!targetTask) return;
+    if (sourceList?.tasks)
+      sourceList.tasks = sourceList?.tasks.filter(
+        (task) => task._id !== targetTask?._id
+      );
+    endList.tasks.push(targetTask as Task);
+    board.lists = (board.lists as List[]).map((item) => {
+      if (item._id === sourceList?._id) return sourceList;
+      else if (item._id === endList._id) return endList;
+      else return item;
+    }) as List[];
+    await saveChangesToBoard({ ...board });
+  };
   return (
-    <div className="h-full space-y-4" style={{ width: "220px" }}>
-      <div className="flex justify-between items-center">
+    <div
+      className="h-full space-y-4"
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
+      onDrop={(e) => handleDrop(e, list)}
+      style={{ width: "220px" }}
+    >
+      <div className="flex flex-wrap justify-between items-center">
         {rename ? (
           <div className="flex space-x-1 items-center">
             <input
@@ -132,16 +174,15 @@ function TaskList({ board, list }: { board: Board; list: List }) {
               placeholder="Type here"
               defaultValue={list.title}
               ref={titleRef}
+              onKeyUp={(e) => {
+                if (e.key === "Enter" || e.keyCode === 13) {
+                  handleRename();
+                }
+              }}
             ></input>
-            <button
-              className="rounded-full bg-green-600 text-white w-6 h-6 focus:outline-none"
-              onClick={handleRename}
-            >
-              <i className="fas fa-check text-xs"></i>
-            </button>
           </div>
         ) : (
-          <h1>{list.title}</h1>
+          <h1 className="break-all">{list.title}</h1>
         )}
         <div>
           <i className="fas fa-ellipsis-h cursor-pointer" ref={optionsRef}></i>
@@ -154,7 +195,7 @@ function TaskList({ board, list }: { board: Board; list: List }) {
           ></CustomMenu>
         </div>
       </div>
-      {list.tasks.map((task) => (
+      {list?.tasks?.map((task) => (
         <TaskCard key={task._id} task={task}></TaskCard>
       ))}
       <button

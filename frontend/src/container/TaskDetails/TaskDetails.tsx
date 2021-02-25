@@ -39,8 +39,11 @@ const Comment = ({ comment }: { comment: CommentType }) => {
     );
   };
   return (
-    <div className="space-y-2 border-t-2 first:border-0 py-5 border-gray-200">
-      <div className="flex justify-between items-top">
+    <div
+      v-for="item in items"
+      className="space-y-2 border-gray-200  border-t-2 first:border-t-0 py-5"
+    >
+      <div className="flex flex-col space-y-1 md:space-y-0  md:flex-row justify-between">
         <div className="flex items-center space-x-2">
           <img
             className="w-9 h-9 rounded-lg"
@@ -126,7 +129,7 @@ const Comments = ({ comments }: { comments: CommentType[] }) => {
           </button>
         </div>
       </form>
-      <div className="first:border-0">
+      <div>
         {comments.map((comment) => (
           <Comment key={comment._id} comment={comment}></Comment>
         ))}
@@ -241,10 +244,15 @@ function TaskDetails({ task }: { task: Task }) {
                 </div>
               </div>
             ) : (
-              <div className="flex space-x-3 text-xs items-center">
-                <h1 className="font-bold text-xl">{currentTask.title}</h1>
+              <div className="flex flex-wrap">
+                <h1
+                  className="font-bold text-xl word-breaks mr-2"
+                  style={{ wordBreak: "break-word" }}
+                >
+                  {currentTask.title}
+                </h1>
                 <button
-                  className="ring-1 ring-gray-300  hover:bg-gray-100 focus:outline-none text-gray-500 bg-white py-1 px-3 rounded-lg"
+                  className="ring-1 ring-gray-300  text-xs hover:bg-gray-100 focus:outline-none text-gray-500 bg-white py-1 px-3 rounded-lg"
                   onClick={() => setEditTitle((prevState) => !prevState)}
                 >
                   <i className="fas fa-edit mr-2"></i>Edit
@@ -290,7 +298,9 @@ function TaskDetails({ task }: { task: Task }) {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm m-0">{currentTask.description}</p>
+                <p className="text-sm m-0 break-words">
+                  {currentTask.description}
+                </p>
               )}
             </div>
             <div className="space-y-3">
