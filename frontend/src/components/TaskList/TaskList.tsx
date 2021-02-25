@@ -54,7 +54,9 @@ const TaskCard = ({ task }: { task: Task }) => {
         onDragStart={(e) => handleDragStart(e, task._id as string)}
         onClick={(e) => {
           e.stopPropagation();
-          openDialog({ children: <TaskDetails task={task}></TaskDetails> });
+          openDialog({
+            children: <TaskDetails taskId={task._id as string}></TaskDetails>,
+          });
         }}
       >
         {task.coverURL && (

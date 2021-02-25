@@ -22,6 +22,17 @@ export const updateTask = async (data: Task): Promise<Message> => {
   }
 };
 
+export const deleteTask = async (id: string): Promise<Message> => {
+  try {
+    const result = await axios.get("/tasks/delete/" + id);
+    return {
+      data: result.data,
+    };
+  } catch (error) {
+    return errorHandler(error);
+  }
+};
+
 export const fetchTask = (id: string) => {
   return async (dispatch: Dispatch) => {
     try {

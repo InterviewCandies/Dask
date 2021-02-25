@@ -4,14 +4,22 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { createComment, deleteComment } from "../../api/comment/comment";
-import { fetchTask } from "../../api/task/task";
+import { deleteTask, fetchTask } from "../../api/task/task";
 import Assignment from "../../components/Assignment/Assignment";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
 import CustomPopover from "../../components/CustomPopover/CustomPopover";
 import LabelGenerator from "../../components/LabelGenerator/LabelGenerator";
+import useUpdateBoard from "../../hooks/useUpdateBoard";
 import useUpdateCurrentTask from "../../hooks/useUpdateCurrentTask";
 import { useDialog } from "../../provider/DialogProvider";
-import { CommentType, DEFAULT_AVATAR, StateTypes, Task } from "../../types";
+import {
+  Board,
+  CommentType,
+  DEFAULT_AVATAR,
+  List,
+  StateTypes,
+  Task,
+} from "../../types";
 import { errorHandler } from "../../utils/errorHandler";
 import { formatDate } from "../../utils/formatDate";
 
@@ -168,7 +176,7 @@ const Attachments = ({ files }: { files: [] }) => {
   );
 };
 
-function TaskDetails({ task }: { task: Task }) {
+function TaskDetails({ taskId }: { taskId: string }) {
   const descriptionRef = useRef(null);
   const titleRef = useRef(null);
   const [edit, setEdit] = useState(false);
@@ -176,14 +184,21 @@ function TaskDetails({ task }: { task: Task }) {
   const [, closeDialog] = useDialog();
   const currentTask: Task = useSelector((state: StateTypes) => state.task);
   const { saveChangesToCurrentTask } = useUpdateCurrentTask();
+  const { saveChangesToBoard } = useUpdateBoard();
   const labelRef = useRef(null);
   const assignmentRef = useRef(null);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const url = window.location.pathname;
+  const id: string = url.substring(url.lastIndexOf("/") + 1);
+  const boards = useSelector((state: StateTypes) => state.boards);
+  const board = boards?.find((board) => board._id === id);
 
   const dispatch: Dispatch<any> = useDispatch();
   useEffect(() => {
     const fetchCurrentTask = async () => {
       try {
-        const result = await dispatch(fetchTask(task._id as string));
+        const result = await dispatch(fetchTask(taskId as string));
       } catch (error) {
         return errorHandler(error);
       }
@@ -196,6 +211,31 @@ function TaskDetails({ task }: { task: Task }) {
     const newTask = { ...currentTask, title };
     const result = await saveChangesToCurrentTask(newTask);
     if (!result?.status) setEditTitle(false);
+  };
+
+  const handleDeleteTask = async () => {
+    let result = await deleteTask(currentTask._id as string);
+    if (result.status) {
+      enqueueSnackbar(result.message, { variant: "error" });
+      return;
+    }
+    const currentList = board?.lists?.find(
+      (list) =>
+        list.tasks.findIndex((task) => task._id === currentTask._id) >= 0
+    );
+    if (currentList?.tasks)
+      currentList.tasks = currentList?.tasks.filter(
+        (task) => task._id !== currentTask._id
+      ) as List[];
+    const newLists = board?.lists?.map((list) => {
+      if (currentList?._id === list._id) return currentList;
+      else return list;
+    }) as List[];
+    result = await saveChangesToBoard(
+      { ...(board as Board), lists: [...newLists] },
+      `Task ${currentTask.title} is deleted`
+    );
+    if (result.data) closeDialog();
   };
 
   const handleUpdateDescription = async () => {
@@ -304,18 +344,12 @@ function TaskDetails({ task }: { task: Task }) {
               )}
             </div>
             <div className="space-y-3">
-              <div className="flex space-x-3 text-xs items-center">
-                <h1 className="text-xs text-gray-600 font-semibold">
-                  <i className="fas fa-paperclip mr-2"></i> Attachments
-                </h1>
-                <button
-                  className="ring-1 ring-gray-300  hover:bg-gray-100 focus:outline-none text-gray-500 bg-white py-1 px-3 rounded-lg"
-                  onClick={() => {}}
-                >
-                  <i className="fas fa-plus mr-2"></i>Add
-                </button>
-              </div>
-              <Attachments files={task.files as []}></Attachments>
+              <button
+                className="focus:outline-none px-5 py-1 hover:bg-red-100 ring-red-500 ring-1 text-red-500 rounded-lg"
+                onClick={handleDeleteTask}
+              >
+                <i className="fas fa-trash mr-2"></i> Delete task
+              </button>
             </div>
           </div>
 
