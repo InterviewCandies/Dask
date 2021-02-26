@@ -1,3 +1,4 @@
 {
-  "secret": "This is the secret code for JWT authentication"
+  "secret": "This is the secret code for JWT authentication",
+  "connectedString": "mongodb+srv://thang:xFeBPafBDipsyJOF@dask.ox3be.mongodb.net/Dask?retryWrites=true&w=majority"
 }
