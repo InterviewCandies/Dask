@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const router = require("./routes");
 const jwt = require("./utils/jwt");
 const errorHandler = require("./utils/errorHandler");
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 const config = require("./config.json");
 
 app.use(cors());
