@@ -1,5 +1,5 @@
 import { useSnackbar } from "notistack";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../../api/firebase/authentication";
 import Loader from "../../components/common/Loader/Loader";
@@ -7,10 +7,14 @@ import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButt
 import useGetToken from "../../hooks/useGetToken";
 import logo from "../../assets/img/logo.png";
 import { useLoading } from "../../provider/LoaderProvider";
+import { AUTH_TOKEN } from "../../types";
+import { useHistory } from "react-router-dom";
 function Login() {
   const { handleSubmit, register } = useForm();
   const getToken = useGetToken();
   const { showLoader, hideLoader } = useLoading();
+  const history = useHistory();
+
   const onSubmit = async (data: { email: string; password: string }) => {
     showLoader();
     const result = await login(data.email, data.password);
@@ -18,6 +22,12 @@ function Login() {
     hideLoader();
   };
 
+  useEffect(() => {
+    let isAuth = localStorage.getItem(AUTH_TOKEN);
+    if (isAuth && isAuth !== "undefined") {
+      history.push("/all");
+    }
+  }, []);
   return (
     <div className="w-screen h-screen bg-blue-300 flex justify-center items-center">
       <div className="bg-white h-full sm:h-auto p-8 w-full sm:w-96 rounded shadow-md flex flex-col justify-center">
