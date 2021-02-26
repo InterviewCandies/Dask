@@ -232,11 +232,8 @@ function TaskDetails({ taskId }: { taskId: string }) {
   useEffect(() => {
     const fetchCurrentTask = async () => {
       try {
-        showLoader();
         const result = await dispatch(fetchTask(taskId as string));
-        hideLoader();
       } catch (error) {
-        hideLoader();
         return errorHandler(error);
       }
     };

@@ -37,7 +37,10 @@ const displayMembers = (members: User[]) => {
 };
 function Card(props: { board: Board; onClick: Function }) {
   return (
-    <div className="bg-white rounded-xl p-4" onClick={() => props.onClick()}>
+    <div
+      className="bg-white rounded-xl p-4 shadow"
+      onClick={() => props.onClick()}
+    >
       <div>
         <CustomImage
           className="w-full h-48 rounded-lg"

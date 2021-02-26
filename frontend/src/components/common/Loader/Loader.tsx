@@ -1,3 +1,4 @@
+import zIndex from "@material-ui/core/styles/zIndex";
 import React from "react";
 import { ScaleLoader } from "react-spinners";
 type Props = {
@@ -10,7 +11,10 @@ const DEFAULT_COLOR = "#001eb3";
 
 function Loader({ loading, color, title }: Props) {
   return (
-    <div className="fixed top-0 bottom-0 right-0 left-0 bg-white opacity-80 flex m-0 p-0 justify-center items-center">
+    <div
+      className="fixed top-0  bottom-0 right-0 left-0 bg-gray-500 opacity-80 flex m-0 p-0 justify-center items-center"
+      style={{ zIndex: 2000 }}
+    >
       <div className="flex flex-col justify-center items-center">
         <ScaleLoader
           color={color || DEFAULT_COLOR}

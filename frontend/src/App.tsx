@@ -42,10 +42,10 @@ const PrivateRoute: React.FC<RouteProps> = ({
 function App() {
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <Provider store={store}>
-        <SnackbarProvider maxSnack={1}>
-          <DialogProvider>
-            <LoadingProvider>
+      <LoadingProvider>
+        <Provider store={store}>
+          <SnackbarProvider maxSnack={1}>
+            <DialogProvider>
               <Router>
                 <Switch>
                   <Route path="/" component={Login} exact></Route>
@@ -64,10 +64,10 @@ function App() {
                   <Redirect to="/404"></Redirect>
                 </Switch>
               </Router>
-            </LoadingProvider>
-          </DialogProvider>
-        </SnackbarProvider>
-      </Provider>
+            </DialogProvider>
+          </SnackbarProvider>
+        </Provider>
+      </LoadingProvider>
     </ErrorBoundary>
   );
 }
