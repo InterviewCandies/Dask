@@ -6,16 +6,16 @@ import Loader from "../../components/common/Loader/Loader";
 import LoginButtonGroup from "../../components/common/LoginButtonGroup/LoginButtonGroup";
 import useGetToken from "../../hooks/useGetToken";
 import logo from "../../assets/img/logo.png";
+import { useLoading } from "../../provider/LoaderProvider";
 function Login() {
   const { handleSubmit, register } = useForm();
   const getToken = useGetToken();
-  const [loading, setLoading] = useState(false);
-
+  const { showLoader, hideLoader } = useLoading();
   const onSubmit = async (data: { email: string; password: string }) => {
-    setLoading(true);
+    showLoader();
     const result = await login(data.email, data.password);
     await getToken(result);
-    setLoading(false);
+    hideLoader();
   };
 
   return (
@@ -58,7 +58,6 @@ function Login() {
           </a>
         </h1>
       </div>
-      {loading && <Loader title="Processing..."></Loader>}
     </div>
   );
 }

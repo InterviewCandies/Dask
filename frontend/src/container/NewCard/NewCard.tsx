@@ -5,26 +5,27 @@ import { createTask } from "../../api/task/task";
 import Loader from "../../components/common/Loader/Loader";
 import useUpdateBoard from "../../hooks/useUpdateBoard";
 import { useDialog } from "../../provider/DialogProvider";
+import { useLoading } from "../../provider/LoaderProvider";
 import { Board, List } from "../../types";
 
 function NewCard({ board, list }: { board: Board; list: List }) {
   const { register, handleSubmit } = useForm();
-  const [loading, setLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [, closeDialog] = useDialog();
   const { saveChangesToBoard } = useUpdateBoard();
+  const { showLoader, hideLoader } = useLoading();
 
   const onSubmit = async (data: { title: string; description: string }) => {
     let { title, description } = data;
     title = title.trim() || "Untitled";
     description = description.trim() || "No description";
 
-    setLoading(true);
+    showLoader();
 
     let result = await createTask({ title, description });
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
-      setLoading(false);
+      hideLoader();
       return;
     }
     const inx = board.lists?.findIndex((item) => item._id == list._id);
@@ -47,7 +48,7 @@ function NewCard({ board, list }: { board: Board; list: List }) {
       enqueueSnackbar("New task is added", { variant: "success" });
       closeDialog();
     }
-    setLoading(false);
+    hideLoader();
   };
 
   return (
@@ -85,7 +86,6 @@ function NewCard({ board, list }: { board: Board; list: List }) {
           </button>
         </div>
       </form>
-      {loading && <Loader></Loader>}
     </div>
   );
 }

@@ -170,7 +170,7 @@ module.exports = {
       0: "0",
       DEFAULT: "1",
     },
-    fontFamily: {
+    Family: {
       sans: [
         "ui-sans-serif",
         "system-ui",

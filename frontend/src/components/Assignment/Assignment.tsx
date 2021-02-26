@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import useUpdateCurrentTask from "../../hooks/useUpdateCurrentTask";
+import { useLoading } from "../../provider/LoaderProvider";
 import { DEFAULT_AVATAR, StateTypes, Task, User } from "../../types";
-import Loader from "../common/Loader/Loader";
+import CustomImage from "../common/CustomImage/CustomImage";
 import Searchbar from "../common/Searchbar/Searchbar";
 
 const UserItem = ({ task, user }: { task: Task; user: User }) => {
   const { saveChangesToCurrentTask } = useUpdateCurrentTask();
-
+  const { showLoader, hideLoader } = useLoading();
   const isUserAssigned = () => {
     return (
       (task.members as User[]).findIndex(
@@ -17,6 +18,7 @@ const UserItem = ({ task, user }: { task: Task; user: User }) => {
   };
 
   const handleAssign = async () => {
+    showLoader();
     await saveChangesToCurrentTask(
       {
         ...task,
@@ -24,9 +26,11 @@ const UserItem = ({ task, user }: { task: Task; user: User }) => {
       },
       `${user.email} is added to task`
     );
+    hideLoader();
   };
 
   const handleUnAssign = async () => {
+    showLoader();
     const members = (task.members as User[]).filter(
       (member) => member.email !== user.email
     );
@@ -37,16 +41,17 @@ const UserItem = ({ task, user }: { task: Task; user: User }) => {
       },
       `${user.email} is removed from task`
     );
+    hideLoader();
   };
 
   return (
     <>
       <div className="flex  space-y-2 justify-between items-center text-left  hover:bg-gray-100 rounded p-2">
         <div className="flex  items-center">
-          <img
+          <CustomImage
             className="w-8 h-8 rounded-lg mr-2"
             src={user.photoURL ? user.photoURL : DEFAULT_AVATAR}
-          ></img>
+          ></CustomImage>
           <h1 className="text-sm truncate m-0 w-44">{user.email}</h1>
         </div>
         {!isUserAssigned() ? (
@@ -69,11 +74,38 @@ const UserItem = ({ task, user }: { task: Task; user: User }) => {
   );
 };
 
+const filterUser = (users: User[], searchKey: string) => {
+  return users.filter((user) =>
+    user.email
+      .toLocaleLowerCase()
+      .includes(searchKey.trim().toLocaleLowerCase())
+  );
+};
+
 function Assignment({ task }: { task: Task }) {
   const url = window.location.pathname;
   const id: string = url.substring(url.lastIndexOf("/") + 1);
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards?.find((board) => board._id === id);
+  const searchRef = useRef(null);
+  const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void;
+
+  useEffect(() => {
+    if (searchRef.current)
+      //@ts-ignore
+      searchRef.current.onchange = (e) => {
+        forceUpdate();
+      };
+  }, [searchRef]);
+
+  const displayUsers = (users: User[]) => {
+    //@ts-ignore
+    const searchKey = searchRef.current?.value || "";
+    return filterUser(users, searchKey).map((user) => (
+      <UserItem user={user} task={task} key={user.email}></UserItem>
+    ));
+  };
+
   return (
     <div className="bg-gray-50 p-3 space-y-4 text-center w-80">
       <div className="text-left">
@@ -82,11 +114,9 @@ function Assignment({ task }: { task: Task }) {
           Search user you want to assgin this task to
         </p>
       </div>
-      <Searchbar></Searchbar>
+      <Searchbar ref={searchRef} placeholder="User..."></Searchbar>
       <div className="bg-white shadow h-48 rounded-xl p-2 overflow-y-auto space-y-2">
-        {(board?.members as User[]).map((user) => (
-          <UserItem user={user} task={task} key={user.email}></UserItem>
-        ))}
+        {displayUsers(board?.members as User[])}
       </div>
     </div>
   );

@@ -20,6 +20,8 @@ import CustomPopover from "../CustomPopover/CustomPopover";
 import Assignment from "../Assignment/Assignment";
 import useUpdateCurrentTask from "../../hooks/useUpdateCurrentTask";
 import { updateTask } from "../../api/task/task";
+import CustomImage from "../common/CustomImage/CustomImage";
+import { useLoading } from "../../provider/LoaderProvider";
 
 const Tag = ({ tag }: { tag: Label }) => {
   return (
@@ -38,15 +40,13 @@ const TaskCard = ({ task }: { task: Task }) => {
   const handleDragStart = (e: any, id: string) => {
     e.currentTarget.style.backgroundColor = "#E2E8F6";
     e.currentTarget.style.border = "dashed 2px #2F80ED";
-
-    console.log("dragstart", id);
     e.dataTransfer.setData("text/plain", id);
   };
 
   return (
     <>
       <div
-        className="space-y-2 bg-white p-3 rounded-2xl shadow-md w-full"
+        className="space-y-3 bg-white p-3 rounded-2xl shadow-md w-full"
         draggable
         onDragEnd={(e) => {
           e.currentTarget.style.backgroundColor = "#fff";
@@ -61,11 +61,11 @@ const TaskCard = ({ task }: { task: Task }) => {
         }}
       >
         {task.coverURL && (
-          <img
+          <CustomImage
             //@ts-ignore
             src={TASK_COVER[task.coverURL]}
             className="h-28 w-full rounded-lg"
-          ></img>
+          ></CustomImage>
         )}
         <h1 className="text-lg font-semibold word-wrap break-words">
           {task.title}
@@ -100,12 +100,12 @@ function TaskList({ board, list }: { board: Board; list: List }) {
   const optionsRef = useRef(null);
   const titleRef = useRef(null);
   const { saveChangesToBoard } = useUpdateBoard();
-  const [loading, setLoading] = useState(false);
   const [rename, setRename] = useState(false);
   const [openDialog, closeDialog] = useDialog();
+  const { showLoader, hideLoader } = useLoading();
 
   const handleDelete = async () => {
-    setLoading(false);
+    showLoader();
     const result = await deleteList(list);
     if (result.status) {
       return;
@@ -116,11 +116,11 @@ function TaskList({ board, list }: { board: Board; list: List }) {
         { ...board, lists: [...newLists] },
         `${list.title} has been removed from this board`
       );
-    setLoading(true);
+    hideLoader();
   };
 
   const handleRename = async () => {
-    setLoading(false);
+    showLoader();
     if (!titleRef.current) return;
     const name = (titleRef.current as any).value;
     let result = await updateList({ ...list, title: name });
@@ -139,7 +139,7 @@ function TaskList({ board, list }: { board: Board; list: List }) {
       `Task list has been renamed to ${name}`
     );
     if (!result.status) setRename(false);
-    setLoading(true);
+    hideLoader();
   };
 
   const handleDrop = async (e: any, endList: List) => {

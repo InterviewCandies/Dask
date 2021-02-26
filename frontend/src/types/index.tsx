@@ -50,6 +50,7 @@ export const TASK_COVER = {
   cover8: Cover8,
   cover9: Cover9,
 };
+
 export interface Board {
   title: string;
   _id: string;

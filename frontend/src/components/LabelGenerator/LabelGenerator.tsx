@@ -1,8 +1,10 @@
 import { Tooltip } from "@material-ui/core";
+import shadows from "@material-ui/core/styles/shadows";
 import { useSnackbar } from "notistack";
 import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import useUpdateCurrentTask from "../../hooks/useUpdateCurrentTask";
+import { useLoading } from "../../provider/LoaderProvider";
 import { LABEL_COLORS, Label, LabelColors, StateTypes } from "../../types";
 
 const Tag = ({ tag }: { tag: Label }) => {
@@ -39,6 +41,7 @@ function LabelGenerator({ currentLabels }: { currentLabels: Label[] }) {
   const { saveChangesToCurrentTask } = useUpdateCurrentTask();
   const inputRef = useRef(null);
   const { enqueueSnackbar } = useSnackbar();
+  const { showLoader, hideLoader } = useLoading();
 
   const handleAddLabel = async () => {
     const text = (inputRef.current as any).value;
@@ -46,6 +49,7 @@ function LabelGenerator({ currentLabels }: { currentLabels: Label[] }) {
       enqueueSnackbar("Label must not be empty", { variant: "error" });
       return;
     }
+    showLoader();
     let choosenColor = colors.findIndex((color) => color == true);
     if (choosenColor < 0) choosenColor = 0;
     const newLabel: Label = {
@@ -58,6 +62,7 @@ function LabelGenerator({ currentLabels }: { currentLabels: Label[] }) {
       ...currentTask,
       tags: [...(currentTask.tags as []), { ...newLabel }],
     });
+    hideLoader();
   };
   return (
     <div className="bg-white p-3 space-y-2 w-min">

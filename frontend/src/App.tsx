@@ -1,6 +1,7 @@
 import React from "react";
 import AllBoards from "./pages/AllBoards/AllBoards";
 import { Provider, useSelector } from "react-redux";
+import { ErrorBoundary } from "react-error-boundary";
 import {
   BrowserRouter as Router,
   Switch,
@@ -16,7 +17,8 @@ import { SnackbarProvider } from "notistack";
 import { AUTH_TOKEN } from "./types";
 import Board from "./pages/Board/Board";
 import DialogProvider from "./provider/DialogProvider";
-import useLoader from "./hooks/useLoader";
+import LoadingProvider from "./provider/LoaderProvider";
+import ErrorPage from "./pages/ErrorPage/ErrorPage";
 
 const PrivateRoute: React.FC<RouteProps> = ({
   component: Component,
@@ -39,30 +41,34 @@ const PrivateRoute: React.FC<RouteProps> = ({
 };
 function App() {
   return (
-    <Provider store={store}>
-      <SnackbarProvider maxSnack={1}>
-        <DialogProvider>
-          <Router>
-            <Switch>
-              <Route path="/" component={Login} exact></Route>
-              <Route path="/register" exact component={Register}></Route>
-              <PrivateRoute
-                path="/all"
-                component={AllBoards}
-                exact
-              ></PrivateRoute>
-              <PrivateRoute
-                path="/board/:id"
-                component={Board}
-                exact
-              ></PrivateRoute>
-              <PrivateRoute path="/404" component={Page404}></PrivateRoute>
-              <Redirect to="/404"></Redirect>
-            </Switch>
-          </Router>
-        </DialogProvider>
-      </SnackbarProvider>
-    </Provider>
+    <ErrorBoundary FallbackComponent={ErrorPage}>
+      <Provider store={store}>
+        <SnackbarProvider maxSnack={1}>
+          <DialogProvider>
+            <LoadingProvider>
+              <Router>
+                <Switch>
+                  <Route path="/" component={Login} exact></Route>
+                  <Route path="/register" exact component={Register}></Route>
+                  <PrivateRoute
+                    path="/all"
+                    component={AllBoards}
+                    exact
+                  ></PrivateRoute>
+                  <PrivateRoute
+                    path="/board/:id"
+                    component={Board}
+                    exact
+                  ></PrivateRoute>
+                  <PrivateRoute path="/404" component={Page404}></PrivateRoute>
+                  <Redirect to="/404"></Redirect>
+                </Switch>
+              </Router>
+            </LoadingProvider>
+          </DialogProvider>
+        </SnackbarProvider>
+      </Provider>
+    </ErrorBoundary>
   );
 }
 export default App;

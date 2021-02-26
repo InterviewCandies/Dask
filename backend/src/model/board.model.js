@@ -13,6 +13,7 @@ const Board = new Schema({
   },
   visibility: {
     type: Boolean,
+    default: false,
   },
   lists: {
     type: [],

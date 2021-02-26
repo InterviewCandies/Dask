@@ -21,6 +21,7 @@ import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
 import { addBoard } from "../../actions/board";
 import { useDialog } from "../../provider/DialogProvider";
+import { useLoading } from "../../provider/LoaderProvider";
 function NewBoard() {
   const [visibility, setVisibility] = useState(false);
   const { register, handleSubmit } = useForm();
@@ -31,6 +32,7 @@ function NewBoard() {
   const [preview, setPreview] = useState();
   const [, closeDialog] = useDialog();
   const user = useSelector((state: StateTypes) => state.user);
+  const { showLoader, hideLoader } = useLoading();
   // create a preview as a side effect, whenever selected file is changed
   // Reference: https://stackoverflow.com/a/57781164/14480038
 
@@ -62,12 +64,14 @@ function NewBoard() {
   };
 
   const onSubmit = async (data: Board) => {
+    showLoader();
     data.visibility = visibility;
     let result: Message = {};
 
     if (selectedFile) {
       result = await uploadImage(selectedFile);
       if (result.status) {
+        hideLoader();
         enqueueSnackbar(result.message, { variant: "error" });
         return;
       }
@@ -78,10 +82,12 @@ function NewBoard() {
     result = await createBoard(data);
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
+      hideLoader();
       return;
     }
     enqueueSnackbar("Board is added", { variant: "success" });
     addNewBoard(result.data);
+    hideLoader();
     closeDialog();
   };
   return (

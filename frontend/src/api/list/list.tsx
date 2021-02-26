@@ -1,7 +1,10 @@
 import { list } from "postcss";
-import { List, Message } from "../../types";
+import { AUTH_TOKEN, List, Message } from "../../types";
 import axios from "../../utils/axios";
 import { errorHandler } from "../../utils/errorHandler";
+
+axios.defaults.headers.common["Authorization"] =
+  "Bearer " + localStorage.getItem(AUTH_TOKEN);
 
 export const createList = async (data: List): Promise<Message> => {
   try {

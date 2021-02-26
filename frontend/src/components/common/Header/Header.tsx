@@ -12,22 +12,31 @@ import { useSelector } from "react-redux";
 import CustomMenu from "../../CustomMenu/CustomMenu";
 import { useHistory } from "react-router-dom";
 import logo from "../../../assets/img/logo.png";
+import CustomImage from "../CustomImage/CustomImage";
 
 function Header() {
   const dropdownRef = useRef();
   const history = useHistory();
   const { email, photoURL } = useSelector((state: StateTypes) => state.user);
-
   return (
-    <div className="bg-white flex justify-between items-center p-5 flex-col sm:flex-row border-b-2	 border-gray-200">
-      <img src={logo} className="h-10 object-contain"></img>
+    <div className="bg-white flex justify-between items-center p-5 flex-col md:flex-row border-b-2	 border-gray-200">
+      <div className="flex flex-col  space-y-2 md:space-y-0 md:flex-row md:space-x-3">
+        <img src={logo} className="h-10 object-contain" alt="logo"></img>
+        {!window.location.toString().includes("all") && (
+          <button
+            className="text-xs bg-gray-200 focus:outline-none font-bold text-gray-500 py-2 px-4 rounded-xl"
+            onClick={() => history.push("/all")}
+          >
+            <i className="fas fa-grip-vertical"></i> All boards
+          </button>
+        )}
+      </div>
       <div className="flex items-center relative space-x-4  flex-col space-y-2 sm:space-y-0  sm:flex-row">
-        <Searchbar></Searchbar>
         <div className="flex items-center space-x-2">
-          <img
+          <CustomImage
             src={photoURL || DEFAULT_AVATAR}
             className="w-9 h-9 rounded"
-          ></img>
+          ></CustomImage>
 
           <p>{email}</p>
           <div>
@@ -36,14 +45,6 @@ function Header() {
             </button>
             <CustomMenu
               options={[
-                {
-                  title: (
-                    <h1>
-                      <i className="fas fa-user mr-2"></i> Profile
-                    </h1>
-                  ),
-                  onClick: () => {},
-                },
                 {
                   title: (
                     <h1>

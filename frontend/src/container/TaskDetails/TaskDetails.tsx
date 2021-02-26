@@ -3,9 +3,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
-import { createComment, deleteComment } from "../../api/comment/comment";
+import {
+  createComment,
+  deleteComment,
+  updateComment,
+} from "../../api/comment/comment";
 import { deleteTask, fetchTask } from "../../api/task/task";
 import Assignment from "../../components/Assignment/Assignment";
+import CustomImage from "../../components/common/CustomImage/CustomImage";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
 import CoverImageMenu from "../../components/CoverImageMenu/CoverImageMenu";
 import CustomPopover from "../../components/CustomPopover/CustomPopover";
@@ -13,6 +18,7 @@ import LabelGenerator from "../../components/LabelGenerator/LabelGenerator";
 import useUpdateBoard from "../../hooks/useUpdateBoard";
 import useUpdateCurrentTask from "../../hooks/useUpdateCurrentTask";
 import { useDialog } from "../../provider/DialogProvider";
+import { useLoading } from "../../provider/LoaderProvider";
 import {
   Board,
   CommentType,
@@ -31,6 +37,8 @@ const Comment = ({ comment }: { comment: CommentType }) => {
   const currentTask = useSelector((state: StateTypes) => state.task);
   const { enqueueSnackbar } = useSnackbar();
   const { saveChangesToCurrentTask } = useUpdateCurrentTask();
+  const [edit, setEdit] = useState(false);
+  const contentRef = useRef(null);
 
   const handleDeleteComment = async (id: string) => {
     let result = await deleteComment(id);
@@ -49,17 +57,40 @@ const Comment = ({ comment }: { comment: CommentType }) => {
       "Comment is added"
     );
   };
+
+  const handleEditComment = async () => {
+    const text = (contentRef.current as any)?.value;
+    if (!text.trim().length) return;
+
+    let result = await updateComment(comment);
+    if (result.status) {
+      enqueueSnackbar(result.message, { variant: "error" });
+      return;
+    }
+
+    const inx = currentTask.comments?.findIndex(
+      (item) => item._id === comment._id
+    );
+
+    if (currentTask.comments)
+      currentTask.comments[inx as number].content = text;
+
+    result = await saveChangesToCurrentTask({
+      ...currentTask,
+    });
+    setEdit(false);
+  };
   return (
     <div
       v-for="item in items"
-      className="space-y-2 border-gray-200  border-t-2 first:border-t-0 py-5"
+      className="space-y-2 border-gray-200 border-t-2  py-5"
     >
       <div className="flex flex-col space-y-1 md:space-y-0  md:flex-row justify-between">
         <div className="flex items-center space-x-2">
-          <img
+          <CustomImage
             className="w-9 h-9 rounded-lg"
             src={comment.author.photoURL || DEFAULT_AVATAR}
-          ></img>
+          ></CustomImage>
           <div>
             <h1 className="text-sm font-bold">{comment.author.email}</h1>
             <p className="text-xs text-gray-600">
@@ -69,9 +100,21 @@ const Comment = ({ comment }: { comment: CommentType }) => {
         </div>
         {user.email == comment.author.email && (
           <div className="flex space-x-2">
-            <button className="text-gray-500 text-xs hover:bg-gray-100 focus:outline-none py-1 p-2 rounded-lg">
-              Edit
-            </button>
+            {!edit ? (
+              <button
+                className="text-gray-500 text-xs hover:bg-gray-100 focus:outline-none py-1 p-2 rounded-lg"
+                onClick={() => setEdit(true)}
+              >
+                Edit
+              </button>
+            ) : (
+              <button
+                className="text-green-500 text-xs hover:bg-green-100 focus:outline-none py-1 p-2 rounded-lg"
+                onClick={handleEditComment}
+              >
+                Save
+              </button>
+            )}
             <button
               className="text-gray-500 text-xs hover:bg-gray-100 focus:outline-none py-1 p-2 rounded-lg"
               onClick={() => handleDeleteComment(comment._id as string)}
@@ -82,7 +125,16 @@ const Comment = ({ comment }: { comment: CommentType }) => {
         )}
       </div>
       <div>
-        <p className="">{comment.content}</p>
+        {edit ? (
+          <textarea
+            rows={5}
+            ref={contentRef}
+            defaultValue={comment.content}
+            className="p-2 w-full border-2 border-gray-200 rounded-lg focus:border-blue-300 focus:outline-none"
+          ></textarea>
+        ) : (
+          <p className="">{comment.content}</p>
+        )}
       </div>
     </div>
   );
@@ -95,15 +147,18 @@ const Comments = ({ comments }: { comments: CommentType[] }) => {
   const contentRef = useRef<null | HTMLTextAreaElement>(null);
   const user = useSelector((state: StateTypes) => state.user);
   const currentTask = useSelector((state: StateTypes) => state.task);
+  const { showLoader, hideLoader } = useLoading();
 
   const handleCreateComment = async (data: CommentType) => {
     const newComment = {
       content: data.content,
       author: { ...user },
     };
+    showLoader();
     let result = await createComment({ ...newComment });
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
+      hideLoader();
       return;
     }
     result = await saveChangesToCurrentTask(
@@ -114,6 +169,7 @@ const Comments = ({ comments }: { comments: CommentType[] }) => {
       "Comment is added"
     );
     if (!result.status && contentRef.current) contentRef.current.value = "";
+    hideLoader();
   };
   return (
     <div>
@@ -122,7 +178,10 @@ const Comments = ({ comments }: { comments: CommentType[] }) => {
         onSubmit={handleSubmit(handleCreateComment)}
       >
         <div className=" flex space-x-2 ">
-          <img className="w-9 h-9" src={user.photoURL}></img>
+          <CustomImage
+            className="w-9 h-9"
+            src={user.photoURL as string}
+          ></CustomImage>
           <textarea
             ref={(e) => {
               register(e, { required: true });
@@ -135,8 +194,8 @@ const Comments = ({ comments }: { comments: CommentType[] }) => {
           ></textarea>
         </div>
         <div className="flex justify-end">
-          <button className=" focus:outline-none bg-blue-500 px-3 py-1 text-white rounded-xl">
-            Send
+          <button className=" focus:outline-none bg-blue-500 px-3 py-2 text-white rounded-xl">
+            <i className="fas fa-paper-plane"></i> Send
           </button>
         </div>
       </form>
@@ -145,36 +204,6 @@ const Comments = ({ comments }: { comments: CommentType[] }) => {
           <Comment key={comment._id} comment={comment}></Comment>
         ))}
       </div>
-    </div>
-  );
-};
-
-const Attachment = () => {
-  return (
-    <div className="flex space-x-2 items-center">
-      <div className="w-40 h-20 bg-gray-200"></div>
-      <div className="space-y-1">
-        <p className="text-xs text-gray-400">{Date.now()}</p>
-        <h1 className="font-bold">Tittle</h1>
-        <div className="flex space-x-2">
-          <button className="hover:bg-gray-200 text-sm px-2 py-1 ring-2 ring-gray-300 bg-white rounded-lg">
-            Download
-          </button>
-          <button className="hover:bg-gray-200 text-sm px-2 py-1 ring-2 ring-gray-300 bg-white rounded-lg">
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Attachments = ({ files }: { files: [] }) => {
-  return (
-    <div className="space-y-4">
-      {files.map((file, i) => (
-        <Attachment key={i}></Attachment>
-      ))}
     </div>
   );
 };
@@ -192,6 +221,7 @@ function TaskDetails({ taskId }: { taskId: string }) {
   const assignmentRef = useRef(null);
   const coverRef = useRef(null);
   const { enqueueSnackbar } = useSnackbar();
+  const { showLoader, hideLoader } = useLoading();
 
   const url = window.location.pathname;
   const id: string = url.substring(url.lastIndexOf("/") + 1);
@@ -202,8 +232,11 @@ function TaskDetails({ taskId }: { taskId: string }) {
   useEffect(() => {
     const fetchCurrentTask = async () => {
       try {
+        showLoader();
         const result = await dispatch(fetchTask(taskId as string));
+        hideLoader();
       } catch (error) {
+        hideLoader();
         return errorHandler(error);
       }
     };
@@ -211,16 +244,20 @@ function TaskDetails({ taskId }: { taskId: string }) {
   }, []);
 
   const handleUpdateTitle = async () => {
+    showLoader();
     const title = (titleRef.current as any).value.trim() || "Untitled";
     const newTask = { ...currentTask, title };
     const result = await saveChangesToCurrentTask(newTask);
     if (!result?.status) setEditTitle(false);
+    hideLoader();
   };
 
   const handleDeleteTask = async () => {
+    showLoader();
     let result = await deleteTask(currentTask._id as string);
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
+      hideLoader();
       return;
     }
     const currentList = board?.lists?.find(
@@ -240,14 +277,17 @@ function TaskDetails({ taskId }: { taskId: string }) {
       `Task ${currentTask.title} is deleted`
     );
     if (result.data) closeDialog();
+    hideLoader();
   };
 
   const handleUpdateDescription = async () => {
+    showLoader();
     const description =
       (descriptionRef.current as any).value.trim() || "No description";
     const newTask = { ...currentTask, description };
     const result = await saveChangesToCurrentTask(newTask);
     if (!result?.status) setEdit(false);
+    hideLoader();
   };
 
   return (
@@ -259,11 +299,11 @@ function TaskDetails({ taskId }: { taskId: string }) {
         <i className="fas fa-times"></i>
       </button>
       {currentTask.coverURL && (
-        <img
+        <CustomImage
           //@ts-ignore
           src={TASK_COVER[currentTask.coverURL]}
           className="w-full h-28 rounded"
-        ></img>
+        ></CustomImage>
       )}
       <div>
         <div className="grid md:grid-cols-4 grid-cols-1 space-y-4 md:space-y-0">
@@ -278,7 +318,7 @@ function TaskDetails({ taskId }: { taskId: string }) {
                 ></input>
                 <div className="flex space-x-2 mt-2">
                   <button
-                    className="bg-green-600 font-semibold text-white px-3 py-1 rounded-xl focus:outline-none hover:bg-green-500"
+                    className="hover:bg-green-100 font-semibold text-green-500 px-3 py-1 rounded-xl focus:outline-none"
                     onClick={handleUpdateTitle}
                   >
                     Save
@@ -330,7 +370,7 @@ function TaskDetails({ taskId }: { taskId: string }) {
                   ></textarea>
                   <div className="flex space-x-2 mt-2">
                     <button
-                      className="bg-green-600 font-semibold text-white px-3 py-1 rounded-xl focus:outline-none hover:bg-green-500"
+                      className="hover:bg-green-100 font-semibold text-green-500 px-3 py-1 rounded-xl focus:outline-none"
                       onClick={handleUpdateDescription}
                     >
                       Save
@@ -380,7 +420,7 @@ function TaskDetails({ taskId }: { taskId: string }) {
                 className="focus:outline-none px-2 py-2 hover:bg-red-100 ring-red-500 ring-1 text-red-500 rounded-lg"
                 onClick={handleDeleteTask}
               >
-                <i className="fas fa-trash mr-2"></i> Delete task
+                <i className="fas fa-trash mr-2"></i> Delete
               </button>
             </div>
           </div>

@@ -1,5 +1,11 @@
-import { Popover } from "@material-ui/core";
+import { makeStyles, Popover } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    borderRadius: "16px",
+  },
+}));
 
 const CustomPopover = React.forwardRef(
   ({ children }: { children: JSX.Element }, ref) => {
@@ -17,11 +23,15 @@ const CustomPopover = React.forwardRef(
     }, [ref]);
 
     const open = Boolean(anchorEl);
+    const classes = useStyles();
 
     return (
       <Popover
         open={open}
         anchorEl={anchorEl as Element}
+        classes={{
+          paper: classes.paper,
+        }}
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{
           vertical: "bottom",

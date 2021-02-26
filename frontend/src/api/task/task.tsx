@@ -1,8 +1,10 @@
 import { Dispatch } from "redux";
 import { updateCurrentTask } from "../../actions/task";
-import { Message, Task } from "../../types";
+import { AUTH_TOKEN, Message, Task } from "../../types";
 import axios from "../../utils/axios";
 import { errorHandler } from "../../utils/errorHandler";
+axios.defaults.headers.common["Authorization"] =
+  "Bearer " + localStorage.getItem(AUTH_TOKEN);
 
 export const createTask = async (data: Task): Promise<Message> => {
   try {

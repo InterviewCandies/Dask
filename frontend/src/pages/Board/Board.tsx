@@ -1,11 +1,14 @@
-import { Drawer } from "@material-ui/core";
+import classes from "*.module.sass";
+import { Drawer, makeStyles } from "@material-ui/core";
 import { useSnackbar } from "notistack";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { Dispatch } from "redux";
 import { createList } from "../../api/list/list";
 import { fetchUsers } from "../../api/user";
 import Avatars from "../../components/Avatars/Avatars";
+import CustomImage from "../../components/common/CustomImage/CustomImage";
 import GrayButton from "../../components/common/GrayButton/GrayButton";
 import Layout from "../../components/common/Layout/Layout";
 import Loader from "../../components/common/Loader/Loader";
@@ -14,6 +17,7 @@ import CustomPopover from "../../components/CustomPopover/CustomPopover";
 import TaskList from "../../components/TaskList/TaskList";
 import BoardMenu from "../../container/BoardMenu/BoardMenu";
 import useUpdateBoard from "../../hooks/useUpdateBoard";
+import { useLoading } from "../../provider/LoaderProvider";
 import {
   Board,
   DEFAULT_AVATAR,
@@ -21,6 +25,17 @@ import {
   StateTypes,
   User,
 } from "../../types";
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    fontFamily: `ui-sans-serif system-ui -apple-system BlinkMacSystemFont Segoe UI Roboto Helvetica Neue Arial Noto Sans
+        sans-serif
+      Apple Color Emoji
+      Segoe UI Emoji
+      Segoe UI Symbol
+      Noto Color Emoji`,
+  },
+}));
 
 const VisilityMenu = ({
   id,
@@ -31,18 +46,18 @@ const VisilityMenu = ({
 }) => {
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards.find((board) => board._id === id);
-  const [loading, setLoading] = useState(false);
   const { saveChangesToBoard } = useUpdateBoard();
+  const { showLoader, hideLoader } = useLoading();
 
   const handleClick = async (status: Boolean) => {
-    setLoading(true);
+    showLoader();
     const newBoard = { ...board, visibility: status };
     const result = await saveChangesToBoard(
       newBoard as Board,
       "Board is updated"
     );
     if (!result.status && closePopover) closePopover();
-    setLoading(false);
+    hideLoader();
   };
 
   return (
@@ -83,7 +98,6 @@ const VisilityMenu = ({
           </p>
         </button>
       </div>
-      {loading && <Loader></Loader>}
     </>
   );
 };
@@ -91,10 +105,11 @@ const VisilityMenu = ({
 const UserItem = ({ user, id }: { user: User; id: string }) => {
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards.find((board) => board._id === id);
-  const [loading, setLoading] = useState(false);
+  const { showLoader, hideLoader } = useLoading();
+
   const { saveChangesToBoard } = useUpdateBoard();
   const addToBoard = async () => {
-    setLoading(true);
+    showLoader();
     const newBoard = {
       ...board,
       members: [...(board?.members as []), { ...user }],
@@ -103,17 +118,16 @@ const UserItem = ({ user, id }: { user: User; id: string }) => {
       newBoard as Board,
       `${user.email} is added to board`
     );
-    setLoading(false);
+    hideLoader();
   };
   return (
     <>
-      {loading && <Loader title="Processing..."></Loader>}
       <div className="flex  space-y-2 justify-between items-center text-left  hover:bg-gray-100 rounded p-2">
         <div className="flex  items-center">
-          <img
+          <CustomImage
             className="w-8 h-8 rounded-lg mr-2"
             src={user.photoURL ? user.photoURL : DEFAULT_AVATAR}
-          ></img>
+          ></CustomImage>
           <h1 className="text-sm truncate m-0 w-44">{user.email}</h1>
         </div>
         <button
@@ -127,29 +141,50 @@ const UserItem = ({ user, id }: { user: User; id: string }) => {
   );
 };
 
-const displayUsers = (users: User[], id: string) => {
-  return users.map((user) => (
-    <UserItem user={user} key={user.email} id={id}></UserItem>
-  ));
+const filterUser = (users: User[], searchKey: string) => {
+  return users.filter((user) =>
+    user.email
+      .toLocaleLowerCase()
+      .includes(searchKey.trim().toLocaleLowerCase())
+  );
 };
 
 const InvitationMenu = ({ id }: { id: string }) => {
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards?.find((board) => board._id === id);
+  const searchRef = useRef(null);
   let users = useSelector((state: StateTypes) => state.users);
+  const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void;
   users = users.filter(
     (user) =>
       (board?.members as User[]).findIndex(
         (member) => user.email === member.email
       ) < 0
   );
+
+  const displayUsers = (users: User[], id: string) => {
+    //@ts-ignore
+    const searchKey = searchRef.current?.value || "";
+    return filterUser(users, searchKey).map((user) => (
+      <UserItem user={user} key={user.email} id={id}></UserItem>
+    ));
+  };
+
+  useEffect(() => {
+    if (searchRef.current)
+      //@ts-ignore
+      searchRef.current.onchange = (e) => {
+        forceUpdate();
+      };
+  }, [searchRef]);
+
   return (
     <div className="bg-gray-50 p-3 space-y-4 text-center w-80">
       <div className="text-left">
         <h1 className="font-bold text-sm">Invite to board</h1>
         <p className="text-gray-600 text-sm">Search user you want to invite</p>
       </div>
-      <Searchbar></Searchbar>
+      <Searchbar ref={searchRef} placeholder="User..."></Searchbar>
       <div className="bg-white shadow h-48 rounded-xl p-2 overflow-y-auto space-y-2">
         {displayUsers(users, id)}
       </div>
@@ -162,9 +197,11 @@ function BoardDetails() {
   const invitationRef = useRef(null);
   const dispatch: Dispatch<any> = useDispatch();
   const [openMenu, setOpenMenu] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { showLoader, hideLoader } = useLoading();
   const { saveChangesToBoard } = useUpdateBoard();
   const { enqueueSnackbar } = useSnackbar();
+  const classes = useStyles();
+  const history = useHistory();
 
   useEffect(() => {
     async function fetchAllUsers() {
@@ -178,10 +215,11 @@ function BoardDetails() {
   }, []);
 
   const addNewList = async () => {
-    setLoading(true);
+    showLoader();
     const result = await createList({ title: "Untitle", tasks: [] });
     if (result.status) {
       enqueueSnackbar(result.message, { variant: "error" });
+      hideLoader();
       return;
     }
     await saveChangesToBoard(
@@ -191,7 +229,7 @@ function BoardDetails() {
       } as Board,
       "New list is added to board"
     );
-    setLoading(false);
+    hideLoader();
   };
 
   const url = window.location.pathname;
@@ -199,7 +237,10 @@ function BoardDetails() {
   const boards = useSelector((state: StateTypes) => state.boards);
   const board = boards?.find((board) => board._id === id);
   console.log(id, board, boards);
-  if (!board) return <h1>Empty</h1>;
+  if (!board) {
+    history.push("/404");
+    return null;
+  }
   const { visibility, title, members } = board;
 
   return (
@@ -253,6 +294,9 @@ function BoardDetails() {
               <Drawer
                 anchor="right"
                 open={openMenu}
+                classes={{
+                  paper: classes.paper,
+                }}
                 onClose={() => setOpenMenu(false)}
               >
                 <BoardMenu

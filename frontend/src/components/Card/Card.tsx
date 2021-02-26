@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Board,
   DEFAULT_AVATAR,
@@ -6,19 +6,21 @@ import {
   User,
 } from "../../types";
 
+import CustomImage from "../common/CustomImage/CustomImage";
+
 const Avatar = (props: { photoUrl: any }) => {
   return (
-    <img
+    <CustomImage
       className="w-9 h-9 rounded-xl"
       src={props.photoUrl || DEFAULT_AVATAR}
-    ></img>
+    ></CustomImage>
   );
 };
 
 const displayMembers = (members: User[]) => {
   const shortend =
     members.length > MAXIMUM_MEMBERS_DISPLAYED_PER_CARD ? (
-      <span className="text-sm text-gray-400">
+      <span className="text-xs text-gray-400">
         + {members.length - MAXIMUM_MEMBERS_DISPLAYED_PER_CARD} others
       </span>
     ) : null;
@@ -37,12 +39,14 @@ function Card(props: { board: Board; onClick: Function }) {
   return (
     <div className="bg-white rounded-xl p-4" onClick={() => props.onClick()}>
       <div>
-        <img
+        <CustomImage
           className="w-full h-48 rounded-lg"
-          src={props.board.coverURL}
-        ></img>
+          src={props.board.coverURL as string}
+        ></CustomImage>
       </div>
-      <h1 className="font-bold my-4 text-lg capitalize">{props.board.title}</h1>
+      <h1 className="font-bold my-4 text-lg capitalize break-words">
+        {props.board.title}
+      </h1>
       {props.board.members && displayMembers(props.board.members)}
     </div>
   );

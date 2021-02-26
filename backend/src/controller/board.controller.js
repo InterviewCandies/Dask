@@ -23,9 +23,19 @@ class BoardController {
 
   get(req, res, next) {
     const { user } = req.query;
-    Board.find({ owner: user })
+    Board.find({
+      $or: [{ owner: user }, { visibility: false }],
+    })
       .exec()
       .then((boards) => res.json(boards))
+      .catch(next);
+  }
+
+  delete(req, res, next) {
+    const { id } = req.params;
+    Board.findByIdAndDelete(id)
+      .exec()
+      .then(() => res.json({ message: "succecssfullly" }))
       .catch(next);
   }
 

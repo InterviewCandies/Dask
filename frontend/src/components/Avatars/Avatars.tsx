@@ -1,12 +1,13 @@
 import React from "react";
 import { DEFAULT_AVATAR, User } from "../../types";
+import CustomImage from "../common/CustomImage/CustomImage";
 
 const Avatar = (props: { photoUrl: any }) => {
   return (
-    <img
+    <CustomImage
       className="w-8 h-8 rounded"
       src={props.photoUrl || DEFAULT_AVATAR}
-    ></img>
+    ></CustomImage>
   );
 };
 
