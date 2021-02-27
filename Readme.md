@@ -4,11 +4,11 @@
 
 A MERN stack application to manage workloads
 
+## [Demo](https://www.youtube.com/watch?v=pcnP7wh5Xrk&feature=emb_title&ab_channel=Th%E1%BA%AFngV%C3%B5)
+
+## [Website](https://vigilant-villani-8c2817.netlify.app/#/)
+
 ## User Interface
-
-### Login
-
-![login](./img/login.PNG)
 
 ### Home
 
@@ -22,6 +22,13 @@ A MERN stack application to manage workloads
 
 ![task](./img/label.PNG)
 
+## Features
+
+- Implememnt jwt
+- Drag and Drop task
+- Upload image
+- Responsive
+
 ## Technology
 
 - Reactjs
@@ -30,6 +37,14 @@ A MERN stack application to manage workloads
 - MongoDB
 - Redux
 - Tailwind CSS
+- Firebase Authentication
+
+## What I learned
+
+- Advanced hooks : useRef, useCallback
+- Redux Usage
+- Build website with Tailwind CSS
+- Using typescript
 
 ## Credits
 
