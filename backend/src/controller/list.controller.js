@@ -26,7 +26,6 @@ class ListController {
     List.deleteOne({ _id: ObjectId(id) })
       .exec()
       .then((result) => {
-        console.log(result);
         res.json({
           message: "successfully",
         });

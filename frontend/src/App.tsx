@@ -3,7 +3,7 @@ import AllBoards from "./pages/AllBoards/AllBoards";
 import { Provider, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Switch,
   Route,
   Redirect,
@@ -19,12 +19,15 @@ import Board from "./pages/Board/Board";
 import DialogProvider from "./provider/DialogProvider";
 import LoadingProvider from "./provider/LoaderProvider";
 import ErrorPage from "./pages/ErrorPage/ErrorPage";
+import instance from "./utils/axios";
+import axios from "./utils/axios";
 
 const PrivateRoute: React.FC<RouteProps> = ({
   component: Component,
   ...rest
 }) => {
   const token = localStorage.getItem(AUTH_TOKEN);
+
   return (
     <Route
       {...rest}
@@ -40,16 +43,25 @@ const PrivateRoute: React.FC<RouteProps> = ({
   );
 };
 function App() {
+  (function () {
+    let token = "Bearer " + localStorage.getItem(AUTH_TOKEN);
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = token;
+    } else {
+      axios.defaults.headers.common["Authorization"] = "";
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  })();
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
       <LoadingProvider>
         <Provider store={store}>
           <SnackbarProvider maxSnack={1}>
             <DialogProvider>
-              <Router>
+              <Router basename={process.env.PUBLIC_URL}>
                 <Switch>
                   <Route path="/" component={Login} exact></Route>
-                  <Route path="/register" exact component={Register}></Route>
+                  <Route path="/register" component={Register}></Route>
                   <PrivateRoute
                     path="/all"
                     component={AllBoards}

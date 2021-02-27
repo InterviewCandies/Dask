@@ -50,7 +50,6 @@ class BoardController {
       description,
       lists,
     } = req.body;
-    console.log(lists);
     Board.findOneAndUpdate(
       { _id: ObjectId(_id) },
       {
